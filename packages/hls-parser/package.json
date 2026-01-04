@@ -1,0 +1,39 @@
+{
+  "name": "@mtngtools/hls-parser",
+  "version": "0.1.0",
+  "description": "HLS manifest parser for master and variant manifests",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite build --watch",
+    "clean": "rimraf dist",
+    "typecheck": "tsc --noEmit",
+    "lint": "oxlint",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "@mtngtools/hls-types": "workspace:*"
+  },
+  "keywords": [
+    "hls",
+    "parser",
+    "m3u8",
+    "manifest"
+  ],
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  }
+}
+
