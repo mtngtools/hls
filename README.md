@@ -42,6 +42,10 @@ pnpm run lint
 
 This is a monorepo managed with [pnpm workspaces](https://pnpm.io/workspaces) and [Turbo](https://turbo.build/).
 
+## Project Management
+
+Project management in organization-level github project: https://github.com/orgs/mtngtools/projects/1
+
 ## Planning
 
 See [HLS_MONOREPO_PLAN.md](./HLS_MONOREPO_PLAN.md) for detailed planning and architecture decisions.
