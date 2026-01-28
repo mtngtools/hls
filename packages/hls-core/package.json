@@ -1,7 +1,7 @@
 {
   "name": "@mtngtools/hls-core",
   "version": "0.1.0",
-  "description": "Core HLS transfer logic and pipeline orchestration",
+  "description": "HLS pipeline orchestration and interfaces",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -28,9 +28,9 @@
   },
   "keywords": [
     "hls",
-    "transfer",
-    "cdn",
-    "streaming"
+    "orchestrator",
+    "pipeline",
+    "interfaces"
   ],
   "license": "MIT",
   "publishConfig": {

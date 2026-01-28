@@ -1,0 +1,40 @@
+{
+    "name": "@mtngtools/hls-base",
+    "version": "0.1.0",
+    "description": "Default HLS client implementation (Core + Transfer)",
+    "type": "module",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js"
+        }
+    },
+    "files": [
+        "dist"
+    ],
+    "scripts": {
+        "build": "vite build",
+        "dev": "vite build --watch",
+        "clean": "rimraf dist",
+        "typecheck": "tsc --noEmit",
+        "lint": "oxlint",
+        "test": "vitest"
+    },
+    "dependencies": {
+        "@mtngtools/hls-core": "workspace:*",
+        "@mtngtools/hls-transfer": "workspace:*",
+        "@mtngtools/hls-types": "workspace:*",
+        "@mtngtools/hls-parser": "workspace:*"
+    },
+    "keywords": [
+        "hls",
+        "client",
+        "default"
+    ],
+    "license": "MIT",
+    "publishConfig": {
+        "access": "public"
+    }
+}

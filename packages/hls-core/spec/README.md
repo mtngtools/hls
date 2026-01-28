@@ -1,37 +1,52 @@
 # HLS Core Specification
 
-**Package**: `@mtngtools/hls-core` (formerly `hls-transfer`)
+**Package**: `@mtngtools/hls-core`
 
 ## Overview
 
-This package is the heart of the HLS utilities. It orchestrates the entire lifecycle of an HLS transfer or manipulation task. It is designed to be usable as a library in other applications (backends, scripts, etc.).
+This package is the pure orchestration layer for HLS operations. It defines the flow of data and the interfaces required for transfer, but does not contain valid implementations for network or disk I/O. It orchestrates `Fetcher`, [`Parser`](../../hls-parser/spec/README.md), [`Transfer`](../../hls-transfer/spec/README.md), and `Storage` components.
 
 ## Requirements
 
-The core package must implement the following pipeline steps, each designed to be overridable via plugins/hooks:
+1. **TransferJob**
+    * `transferConfig`
+        * both `source` and `destination` have 
+            * `config`: from config types defined in [`Transfer`](../../hls-transfer/spec/README.md)
+            * `concurrency`: 
+                * `maxConcurrent`
+                * `maxConcurrentPerDomain` (planned for future only)
+            * `retry`: Control `maxRetries` and `retryDelay`.
+    * `plugins`: allows overriding any step of the multi-step pipeline.
+    * `options`
+        * `onOverallProgress`
+        * `onVariantProgress`
+        * `onError`
+    * Move chunks from source to destination using streams to minimize memory use.
 
-1.  **Initial Manifest Fetching**:
-    - Must use `ofetch` for robust HTTP requests.
-    - Support custom headers (Auth, User-Agent).
-2.  **Manifest Parsing**:
-    - Parse Master and Variant playlists.
-    - Extract variant streams and chunk lists.
-3.  **Variant & Chunk Discovery**:
-    - recursively discover all resources needed for the stream.
-4.  **Content Transfer**:
-    - Download chunks with configurable concurrency.
-    - Support streaming downloads (memory efficient) where possible.
-    - **Header Management**: Critical requirement to forward necessary tokens/cookies from manifest requests to chunk requests.
-5.  **Storage**:
-    - Abstraction for writing files to destination (Local schemes, mapped to generic "store" operations).
+2.  **Transfer Context (`Context`)**:
+    *   Accept and maintain a request state.
+    *   Hold configuration.
+    *   `masterManifest` (once it's available)
+    *   `filteredVariants` (once it's available)
+    *   Support arbitrary metadata storage.
+    *   *Note*: Progress is tracked via callbacks, not stored in the context state.
 
-## Configuration
-
-The transfer process must be configurable via a typed configuration object (`SourceConfig`, `TransferConfig`) that allows:
-- **`fetch`**: Passing `ofetch` options or a custom `ofetch` instance.
-- **Concurrency**: Limits for parallel downloads.
-- **Plugins**: Overrides for any step in the pipeline.
-
-## Alternatives Considered
-
-- **Monolythic "Transfer" Function**: Considered a single giant function. Rejected in favor of a step-based pipeline to allow fine-grained plugin overrides (e.g., custom decryption during chunk download).
+2.  **Orchestration Pipeline**:
+    *  These steps represent the lifecycle of a transfer job:
+    *   **Step 1: Fetch Master Manifest**: `(url, context) => Promise<Response>`        
+    *   **Step 2: Parse Master Manifest**: `(content, context) => Promise<MasterManifest>`
+    *   **Step 4: Filter Variants**: `(context) => Promise<Variant[]>`
+    *   **Step 5: Fetch Variant Manifest**: `(variant, context) => Promise<Response>`
+    *   **Step 5: Parse Variant Manifest**: `(content, variant, context) => Promise<VariantManifest>`
+    *   **Step 6: Chunk Discovery**: `(manifest, variant, context) => Promise<Chunk[]>`
+    *   **Step 7: Chunk Filter**: `(manifest, variant, chunks, context) => Promise<Chunk[]>`
+    *   **Step 8: Create Destination Master Manifest**: `(context) => Promise<string>`
+    *   **Step 9: Generate Master Manifest Path**: `(sourcePath, manifest, context) => Promise<string>`
+    *   **Step 10: Store Manifest**: `(manifest, path, context) => Promise<void>`
+        * Use at this step for `MasterManifest` and between 12 and 13 for `VariantManifest`
+    *   **Step 11: Create Destination Variant Manifest**: `(chunks, variant, context) => Promise<string>`
+    *   **Step 12: Generate Master Manifest Path**: `(sourcePath, manifest, context) => Promise<string>`
+    *   **Step 12: Download Chunk**: `(chunk, context) => Promise<Stream>`
+    *   **Step 13: Generate Chunk Path**: `(sourcePath, variant, chunk, context) => Promise<string>`
+    *   **Step 14: Store Chunk**: `(stream, path, chunk, context) => Promise<void>`
+    *   **Step 15: Finalize**: `(context) => Promise<void>` (Hook for logging, notifications, or post-processing like MP4 muxing).

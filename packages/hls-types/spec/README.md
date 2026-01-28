@@ -4,20 +4,14 @@
 
 ## Overview
 
-This package serves as the single source of truth for TypeScript interfaces and types used across the monorepo. It ensures consistency in data structures between the parser, core logic, and plugins.
+This package serves as the single source of truth for TypeScript interfaces and types used across the monorepo. It ensures consistency in data structures in all packages.
 
 ## Requirements
 
-1.  **Manifest Interfaces**:
-    - `MasterManifest`: Structure representing a master playlist.
-    - `Variant`: Structure representing a variant stream.
-    - `MediaPlaylist`: Structure representing a media playlist.
-    - `Segment`: Structure representing a media segment/chunk.
-2.  **Configuration Interfaces**:
-    - `SourceConfig`: Configuration for the source (URL, fetch options).
-    - `TransferConfig`: Configuration for the transfer job.
-3.  **Plugin Interfaces**:
-    - Definitions for all lifecycle hooks (fetch, parse, store).
+* Each package will have specifications for interfaces and types that need to be defined. 
+
+* Each type and interfaces should reference the principal package with its specification.
+    * Consider organizing into one .ts file per implementation package
 
 ## Alternatives Considered
 
