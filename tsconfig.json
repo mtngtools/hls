@@ -2,7 +2,9 @@
   "compilerOptions": {
     "target": "ES2022",
     "module": "ESNext",
-    "lib": ["ES2022"],
+    "lib": [
+      "ES2022"
+    ],
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "allowJs": false,
@@ -17,10 +19,37 @@
     "declarationMap": true,
     "sourceMap": true,
     "outDir": "./dist",
-    "rootDir": "./src",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true
   },
-  "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"]
+  "files": [],
+  "references": [
+    {
+      "path": "./packages/hls-base"
+    },
+    {
+      "path": "./packages/hls-cli"
+    },
+    {
+      "path": "./packages/hls-core"
+    },
+    {
+      "path": "./packages/hls-parser"
+    },
+    {
+      "path": "./packages/hls-transfer"
+    },
+    {
+      "path": "./packages/hls-types"
+    },
+    {
+      "path": "./packages/hls-utils"
+    }
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/*.test.ts",
+    "**/*.spec.ts"
+  ]
 }
-

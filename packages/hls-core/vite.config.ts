@@ -15,7 +15,7 @@ export default defineConfig({
       fileName: 'index',
     },
     rollupOptions: {
-      external: ['@mtngtools/hls-types', '@mtngtools/hls-parser', '@mtngtools/hls-core'],
+      external: ['@mtngtools/hls-types', '@mtngtools/hls-parser'],
     },
     outDir: 'dist',
   },

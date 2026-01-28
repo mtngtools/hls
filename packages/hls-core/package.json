@@ -1,11 +1,8 @@
 {
-  "name": "@mtngtools/hls-cli",
+  "name": "@mtngtools/hls-core",
   "version": "0.1.0",
-  "description": "CLI tools for HLS utilities",
+  "description": "HLS pipeline orchestration and interfaces",
   "type": "module",
-  "bin": {
-    "hls": "./dist/cli.js"
-  },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -27,13 +24,13 @@
   },
   "dependencies": {
     "@mtngtools/hls-types": "workspace:*",
-    "@mtngtools/hls-parser": "workspace:*",
-    "@mtngtools/hls-base": "workspace:*"
+    "@mtngtools/hls-parser": "workspace:*"
   },
   "keywords": [
     "hls",
-    "cli",
-    "command-line"
+    "orchestrator",
+    "pipeline",
+    "interfaces"
   ],
   "license": "MIT",
   "publishConfig": {

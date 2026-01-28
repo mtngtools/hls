@@ -1,8 +1,8 @@
 # AGENTS.md
 
-## Package-specific agent guidance for `@mtngtools/hls-transfer`
+## Package-specific agent guidance for `@mtngtools/hls-core`
 
-This file contains only package-specific guidance for automated agents working on the `@mtngtools/hls-transfer` package. See below for additional guidance.
+This file contains only package-specific guidance for automated agents working on the `@mtngtools/hls-core` package. See below for additional guidance.
 
 ## Organization-specific guidance 
 

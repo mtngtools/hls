@@ -1,7 +1,7 @@
 {
-    "name": "@mtngtools/hls-transfer",
+    "name": "@mtngtools/hls-base",
     "version": "0.1.0",
-    "description": "HLS transfer implementations (fetch, storage)",
+    "description": "Default HLS client implementation (Core + Transfer)",
     "type": "module",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
@@ -24,14 +24,14 @@
     },
     "dependencies": {
         "@mtngtools/hls-core": "workspace:*",
+        "@mtngtools/hls-transfer": "workspace:*",
         "@mtngtools/hls-types": "workspace:*",
-        "ofetch": "^1.3.3"
+        "@mtngtools/hls-parser": "workspace:*"
     },
     "keywords": [
         "hls",
-        "transfer",
-        "http",
-        "fetching"
+        "client",
+        "default"
     ],
     "license": "MIT",
     "publishConfig": {

@@ -15,7 +15,7 @@ This monorepo contains TypeScript utilities for working with HLS content, includ
 
 - `@mtngtools/hls-types` - Core types and interfaces
 - `@mtngtools/hls-parser` - HLS manifest parser
-- `@mtngtools/hls-transfer` - Transfer pipeline with plugin system
+- `@mtngtools/hls-core` - Transfer pipeline with plugin system
 - `@mtngtools/hls-utils` - Common utilities
 - `@mtngtools/hls-cli` - CLI tools
 
@@ -42,9 +42,13 @@ pnpm run lint
 
 This is a monorepo managed with [pnpm workspaces](https://pnpm.io/workspaces) and [Turbo](https://turbo.build/).
 
-## Planning
+## Project Management
 
-See [HLS_MONOREPO_PLAN.md](./HLS_MONOREPO_PLAN.md) for detailed planning and architecture decisions.
+Project management in organization-level github project: https://github.com/orgs/mtngtools/projects/1
+
+## Specifications & Planning
+
+See [spec/README.md](./spec/README.md) for detailed specifications, architecture decisions, and planning documentation.
 
 ## License
 

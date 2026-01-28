@@ -6,18 +6,16 @@ export default defineConfig({
     build: {
         lib: {
             entry: resolve(__dirname, 'src/index.ts'),
-            name: 'hls-transfer',
+            name: 'hls-base',
             fileName: 'index',
             formats: ['es'],
         },
         rollupOptions: {
             external: [
-                'node:fs',
-                'node:path',
-                'node:stream',
-                'ofetch',
                 '@mtngtools/hls-core',
-                '@mtngtools/hls-types'
+                '@mtngtools/hls-transfer',
+                '@mtngtools/hls-types',
+                '@mtngtools/hls-parser'
             ],
         },
     },
