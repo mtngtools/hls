@@ -51,15 +51,12 @@ Create GitHub issue templates for:
 
 ## Issue Labels Strategy
 - **Type**: `epic`, `feature`, `task`, `bug`, `enhancement`
-- **Package**: `package:types`, `package:parser`, `package:transfer`, `package:cli`
-- **Repository**: `repo:core`, `repo:hls-aws`, `repo:hls-converter`
+- **Package**: `package:types`, `package:parser`, `package:core`, `package:cli`
 - **Priority**: `priority:high`, `priority:medium`, `priority:low`
 - **Status**: `status:blocked`, `status:needs-review`, `status:ready`
-- **Area**: `area:parsing`, `area:transfer`, `area:plugins`, `area:storage`
+- **Area**: `area:parsing`, `area:core`, `area:cli`
 
 ## Milestones
 - `v0.1.0` - Core parser and types
-- `v0.2.0` - Transfer pipeline basics
+- `v0.2.0` - Transfer pipeline
 - `v0.3.0` - Plugin system
-- `v0.4.0` - AWS S3 integration
-- `v0.5.0` - MP4 converter
