@@ -27,10 +27,11 @@ The goal is to build a comprehensive set of utilities for HLS content management
 The project follows a monorepo structure to organize core logic and interface layers.
 
 ### Packages
-- **`@mtngtools/hls-core`**: The central library containing all transfer logic, parsing, and orchestration.
-- **`@mtngtools/hls-cli`**: A thin command-line wrapper around the core library.
-- **`@mtngtools/hls-parser`**: A lightweight, custom M3U8 parser.
-- **`@mtngtools/hls-types`**: Shared type definitions.
+- **`@mtngtools/hls-core`** ([Spec](../packages/hls-core/spec/README.md)): The central library containing all transfer logic, parsing, and orchestration.
+- **`@mtngtools/hls-cli`** ([Spec](../packages/hls-cli/spec/README.md)): A thin command-line wrapper around the core library.
+- **`@mtngtools/hls-parser`** ([Spec](../packages/hls-parser/spec/README.md)): A lightweight, custom M3U8 parser.
+- **`@mtngtools/hls-utils`** ([Spec](../packages/hls-utils/spec/README.md)): Common utility functions.
+- **`@mtngtools/hls-types`** ([Spec](../packages/hls-types/spec/README.md)): Shared type definitions.
 
 ## Alternatives Considered
 
