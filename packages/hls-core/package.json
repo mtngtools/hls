@@ -1,7 +1,7 @@
 {
-  "name": "@mtngtools/hls-transfer",
+  "name": "@mtngtools/hls-core",
   "version": "0.1.0",
-  "description": "CDN-to-CDN HLS content transfer with plugin system",
+  "description": "Core HLS transfer logic and pipeline orchestration",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -37,4 +37,3 @@
     "access": "public"
   }
 }
-

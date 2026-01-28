@@ -29,27 +29,27 @@ importers:
 
   packages/hls-cli:
     dependencies:
+      '@mtngtools/hls-core':
+        specifier: workspace:*
+        version: link:../hls-core
       '@mtngtools/hls-parser':
         specifier: workspace:*
         version: link:../hls-parser
-      '@mtngtools/hls-transfer':
+      '@mtngtools/hls-types':
         specifier: workspace:*
-        version: link:../hls-transfer
+        version: link:../hls-types
+
+  packages/hls-core:
+    dependencies:
+      '@mtngtools/hls-parser':
+        specifier: workspace:*
+        version: link:../hls-parser
       '@mtngtools/hls-types':
         specifier: workspace:*
         version: link:../hls-types
 
   packages/hls-parser:
     dependencies:
-      '@mtngtools/hls-types':
-        specifier: workspace:*
-        version: link:../hls-types
-
-  packages/hls-transfer:
-    dependencies:
-      '@mtngtools/hls-parser':
-        specifier: workspace:*
-        version: link:../hls-parser
       '@mtngtools/hls-types':
         specifier: workspace:*
         version: link:../hls-types

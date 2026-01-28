@@ -28,7 +28,7 @@
   "dependencies": {
     "@mtngtools/hls-types": "workspace:*",
     "@mtngtools/hls-parser": "workspace:*",
-    "@mtngtools/hls-transfer": "workspace:*"
+    "@mtngtools/hls-core": "workspace:*"
   },
   "keywords": [
     "hls",
@@ -40,4 +40,3 @@
     "access": "public"
   }
 }
-
