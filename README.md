@@ -46,9 +46,9 @@ This is a monorepo managed with [pnpm workspaces](https://pnpm.io/workspaces) an
 
 Project management in organization-level github project: https://github.com/orgs/mtngtools/projects/1
 
-## Planning
+## Specifications & Planning
 
-See [HLS_MONOREPO_PLAN.md](./HLS_MONOREPO_PLAN.md) for detailed planning and architecture decisions.
+See [spec/README.md](./spec/README.md) for detailed specifications, architecture decisions, and planning documentation.
 
 ## License
 
