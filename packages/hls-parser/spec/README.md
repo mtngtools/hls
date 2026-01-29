@@ -30,6 +30,7 @@ A lightweight, zero-dependency parser for HLS M3U8 manifests. It is designed to 
         *   Identify `discontinuity` flags.
         *   Parse `key` (method, uri, iv) and `map` (uri, byteRange) information.
     *   **Tags Support**: Support common standard tags (EXT-X-STREAM-INF, EXTINF, EXT-X-KEY, etc.).
+    *   **Source Content**: Each manifest object returned by the parser includes `sourceContent: string` — the raw M3U8 string that was parsed. This enables the pipeline to store a copy of the source manifest when publishing to destination.
 4.  **Output**: Return structured, typed objects (defined in [`@mtngtools/hls-types`](../../hls-types/spec/README.md)).
 
 ## Alternatives Considered

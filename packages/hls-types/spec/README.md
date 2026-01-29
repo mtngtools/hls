@@ -6,6 +6,14 @@
 
 This package serves as the single source of truth for TypeScript interfaces and types used across the monorepo. It ensures consistency in data structures in all packages.
 
+## Manifest Types
+
+### MasterManifest and VariantManifest
+
+Both `MasterManifest` and `VariantManifest` include:
+
+- **sourceContent**: `string` — Raw M3U8 string as received from source (populated by parser). Enables the pipeline to store a copy of the source manifest when publishing to destination.
+
 ## Requirements
 
 * Each package will have specifications for interfaces and types that need to be defined. 

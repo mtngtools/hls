@@ -44,6 +44,10 @@ This package is the pure orchestration layer for HLS operations. It defines the 
     *   **Step 9: Generate Master Manifest Path**: `(sourcePath, manifest, context) => Promise<string>`
     *   **Step 10: Store Manifest**: `(manifest, path, context) => Promise<void>`
         * Use at this step for `MasterManifest` and between 12 and 13 for `VariantManifest`
+        * **Default behavior**: When storing the destination manifest at `path`, the pipeline MUST also store a copy of the raw source manifest content to a companion path.
+        * **Path convention**: `{path}.source.txt` (e.g., `master.m3u8` → `master.m3u8.source.txt`, `variant1.m3u8` → `variant1.m3u8.source.txt`).
+        * **Source content**: Read from `manifest.sourceContent` (populated by parser). If missing, skip the source copy (e.g., when a plugin provides a manifest without sourceContent).
+        * **Configurability**: This is default behavior; plugins may override `storeManifest` to change or disable it.
     *   **Step 11: Create Destination Variant Manifest**: `(chunks, variant, context) => Promise<string>`
     *   **Step 12: Generate Master Manifest Path**: `(sourcePath, manifest, context) => Promise<string>`
     *   **Step 12: Download Chunk**: `(chunk, context) => Promise<Stream>`

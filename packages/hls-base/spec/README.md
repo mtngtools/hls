@@ -14,3 +14,12 @@ This package acts as the default entry point for most consumers. It combines the
 
 2.  **Ease of Use**:
     -   "Batteries included" experience.
+
+## Default Manifest Storage Behavior
+
+- **storeManifest**: The default implementation stores two files:
+  1. **Destination manifest** at `path` — Serialized M3U8 (transformed for destination URIs).
+  2. **Source manifest copy** at `{path}.source.txt` — Raw M3U8 from `manifest.sourceContent` (unchanged).
+- **Source content**: Read from `manifest.sourceContent`. If missing, skip the source copy.
+- **Path convention**: `{path}.source.txt` (e.g., `./out/master.m3u8` → `./out/master.m3u8.source.txt`).
+- **Plugin override**: Plugins may override `storeManifest` to change path convention, disable source copy, or use a different strategy.
