@@ -1,4 +1,10 @@
-// CLI tools for HLS utilities
+/**
+ * @mtngtools/hls-cli
+ * CLI tools for HLS utilities
+ */
 
-export {};
+export { parseArgs, type CliArgs } from './args.js';
+export { loadConfig, createTransferConfig, type CliConfig } from './config.js';
+export { executeTransfer } from './cli.js';
+
 

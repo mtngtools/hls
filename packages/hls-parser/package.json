@@ -20,10 +20,13 @@
     "clean": "rimraf dist",
     "typecheck": "tsc --noEmit",
     "lint": "oxlint",
-    "test": "vitest"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "E2E_ENABLED=true vitest run"
   },
   "dependencies": {
-    "@mtngtools/hls-types": "workspace:*"
+    "@mtngtools/hls-types": "workspace:*",
+    "@mtngtools/hls-utils": "workspace:*"
   },
   "keywords": [
     "hls",
