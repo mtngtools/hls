@@ -7,7 +7,7 @@ This document outlines the high-level architecture and goals for the HLS (HTTP L
 The goal is to build a comprehensive set of utilities for HLS content management, primarily focused on server-side operations.
 
 ### Key Use Cases
-1.  **CDN-to-CDN Transfer**: efficiently moving HLS content between storage locations while managing headers, authentication, and directory structure.
+1.  **CDN-to-CDN Transfer**: efficiently moving HLS content between storage locations while managing headers, authentication, and directory structure. By default, a copy of the raw source manifest (master and variant) is stored alongside the transformed destination manifest for audit, debugging, and comparison. Path convention: `{manifestPath}.source.txt`.
 2.  **HLS conversion**: Merging HLS segments into single files (future scope).
 
 ## Technology Stack
