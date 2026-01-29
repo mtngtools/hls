@@ -30,6 +30,7 @@ export function parseVariantManifest(
   const manifest: VariantManifest = {
     targetDuration: 0,
     chunks: [],
+    sourceContent: content,
   };
 
   let currentChunk: Partial<Chunk> | null = null;

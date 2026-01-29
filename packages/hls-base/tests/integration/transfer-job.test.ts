@@ -151,10 +151,20 @@ describe('TransferJobExecutor Integration Tests', () => {
     expect(storedMaster).toBeDefined();
     expect(storedMaster).toContain('#EXTM3U');
 
+    // Verify source manifest copy was stored for master
+    const storedMasterSource = mockStorage.getStoredFile('/tmp/hls-output/master.m3u8.source.txt');
+    expect(storedMasterSource).toBeDefined();
+    expect(storedMasterSource).toBe(masterManifest);
+
     // Verify variant manifest was stored
     const storedVariant = mockStorage.getStoredFile('/tmp/hls-output/variant1.m3u8');
     expect(storedVariant).toBeDefined();
     expect(storedVariant).toContain('#EXTM3U');
+
+    // Verify source manifest copy was stored for variant
+    const storedVariantSource = mockStorage.getStoredFile('/tmp/hls-output/variant1.m3u8.source.txt');
+    expect(storedVariantSource).toBeDefined();
+    expect(storedVariantSource).toBe(variantManifest);
 
     // Verify chunks were stored
     expect(mockStorage.getStoredFile('/tmp/hls-output/segment001.ts')).toBeDefined();

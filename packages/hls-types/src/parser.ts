@@ -114,6 +114,8 @@ export interface MasterManifest {
   sessionData?: SessionData[];
   /** Session keys */
   sessionKeys?: SessionKey[];
+  /** Raw M3U8 string as received from source (populated by parser when parsing) */
+  sourceContent?: string;
 }
 
 /**
@@ -194,5 +196,7 @@ export interface VariantManifest {
   endList?: boolean;
   /** List of chunks/segments */
   chunks: Chunk[];
+  /** Raw M3U8 string as received from source (populated by parser when parsing) */
+  sourceContent?: string;
 }
 

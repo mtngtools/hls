@@ -34,6 +34,7 @@ describe('parseVariantManifest', () => {
     const manifest = await parseVariantManifest(content, variant, context);
 
     expect(manifest).toBeDefined();
+    expect(manifest.sourceContent).toBe(content);
     expect(manifest.targetDuration).toBe(10);
     expect(manifest.mediaSequence).toBe(0);
     expect(manifest.playlistType).toBe('VOD');
