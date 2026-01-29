@@ -15,6 +15,7 @@ export default defineConfig({
                 'node:fs',
                 'node:path',
                 'node:stream',
+                'node:stream/promises',
                 'ofetch',
                 '@mtngtools/hls-core',
                 '@mtngtools/hls-types'

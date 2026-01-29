@@ -12,10 +12,12 @@ export default defineConfig({
         },
         rollupOptions: {
             external: [
+                'node:stream',
                 '@mtngtools/hls-core',
                 '@mtngtools/hls-transfer',
                 '@mtngtools/hls-types',
-                '@mtngtools/hls-parser'
+                '@mtngtools/hls-parser',
+                '@mtngtools/hls-utils'
             ],
         },
     },
