@@ -26,6 +26,7 @@ export function parseMasterManifest(
   const tokens = tokenize(content);
   const manifest: MasterManifest = {
     variants: [],
+    sourceContent: content,
   };
 
   let currentVariant: Partial<Variant> | null = null;

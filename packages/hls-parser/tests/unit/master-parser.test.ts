@@ -29,6 +29,7 @@ describe('parseMasterManifest', () => {
     const manifest = await parseMasterManifest(content, context);
 
     expect(manifest).toBeDefined();
+    expect(manifest.sourceContent).toBe(content);
     expect(manifest.variants).toHaveLength(3);
     expect(manifest.version).toBe(3);
     expect(manifest.independentSegments).toBe(true);

@@ -173,7 +173,20 @@ export class DefaultPipelineExecutor implements PipelineExecutor {
         this.push(null); // End stream
       },
     }) as TransferStream;
-    return this.defaults.storage.store(stream, path, context);
+    await this.defaults.storage.store(stream, path, context);
+
+    // Store source manifest copy at {path}.source.txt when available
+    const sourceContent =
+      'sourceContent' in manifest ? (manifest as { sourceContent?: string }).sourceContent : undefined;
+    if (sourceContent) {
+      const sourceStream = new Readable({
+        read() {
+          this.push(Buffer.from(sourceContent, 'utf-8'));
+          this.push(null);
+        },
+      }) as TransferStream;
+      await this.defaults.storage.store(sourceStream, `${path}.source.txt`, context);
+    }
   }
 
   async createDestinationVariantManifest(
