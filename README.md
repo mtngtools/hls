@@ -8,8 +8,10 @@ This monorepo contains TypeScript utilities for working with HLS content, includ
 
 - Manifest parsing and validation
 - CDN-to-CDN content transfer with plugin system
-- HLS to MP4 conversion
-- And more...
+    - Via oFetch 
+    - Supporting custom transfer plugin
+- HLS to MP4 conversion (planned)
+
 
 ## Packages
 
