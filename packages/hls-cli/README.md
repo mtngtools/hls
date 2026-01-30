@@ -24,6 +24,10 @@ hls transfer --source <url> --destination <path>
 - Common HLS operations
 - Integration with other packages
 
+## Specifications
+  
+See [Specification Details](./spec/README.md) for detailed specifications.
+
 ## License
 
 MIT

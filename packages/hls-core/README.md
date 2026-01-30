@@ -28,6 +28,10 @@ import { transfer } from '@mtngtools/hls-core';
 - Progress tracking
 - Streaming download-to-upload
 
+## Specifications
+  
+See [Specification Details](./spec/README.md) for detailed specifications.
+
 ## License
 
 MIT

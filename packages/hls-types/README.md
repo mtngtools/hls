@@ -25,6 +25,10 @@ import type { MasterManifest, Variant, Chunk } from '@mtngtools/hls-types';
 - Comprehensive HLS manifest types
 - Plugin system interfaces
 
+## Specifications
+  
+See [Specification Details](./spec/README.md) for detailed specifications.
+
 ## License
 
 MIT

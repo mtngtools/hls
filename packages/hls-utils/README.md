@@ -24,6 +24,10 @@ import { /* utilities */ } from '@mtngtools/hls-utils';
 - Runtime-agnostic utilities
 - Common helper functions
 
+## Specifications
+  
+See [Specification Details](./spec/README.md) for detailed specifications.
+
 ## License
 
 MIT
