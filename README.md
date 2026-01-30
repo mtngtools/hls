@@ -50,7 +50,7 @@ Project management in organization-level github project: https://github.com/orgs
 
 ## Specifications & Planning
 
-See [spec/README.md](./spec/README.md) for detailed specifications, architecture decisions, and planning documentation.
+See [Specification Details](./spec/README.md) for detailed specifications, architecture decisions, and planning documentation.
 
 ## License
 

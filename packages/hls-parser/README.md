@@ -26,6 +26,10 @@ import { parseMasterManifest, parseVariantManifest } from '@mtngtools/hls-parser
 - Chunk discovery
 - Runtime-agnostic
 
+## Specifications
+  
+See [Specification Details](./spec/README.md) for detailed specifications.
+
 ## License
 
 MIT
