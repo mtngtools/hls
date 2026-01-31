@@ -100,7 +100,7 @@ Usage: hls <source> <destination> [options]
 Transfer HLS content from source to destination.
 
 Arguments:
-  source              Source URL or path (master manifest URL)
+  source              Source URL or path (main manifest URL)
   destination         Destination URL or path
 
 Options:
@@ -114,9 +114,9 @@ Options:
   --version               Show version
 
 Examples:
-  hls https://cdn1.com/master.m3u8 /local/output
-  hls https://cdn1.com/master.m3u8 https://cdn2.com/ --max-concurrent 10
-  hls https://cdn1.com/master.m3u8 /output --config config.json
+  hls https://cdn1.com/main.m3u8 /local/output
+  hls https://cdn1.com/main.m3u8 https://cdn2.com/ --max-concurrent 10
+  hls https://cdn1.com/main.m3u8 /output --config config.json
 `);
 }
 

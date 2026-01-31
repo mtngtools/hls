@@ -2,24 +2,24 @@
  * Unit tests for HlsParser wrapper
  */
 
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { HlsParser } from '../../src/parser.js';
 import type { TransferContext, Variant } from '@mtngtools/hls-types';
 
 // Mock the parser functions
 vi.mock('@mtngtools/hls-parser', () => ({
-  parseMasterManifest: vi.fn(),
+  parseMainManifest: vi.fn(),
   parseVariantManifest: vi.fn(),
 }));
 
-import { parseMasterManifest, parseVariantManifest } from '@mtngtools/hls-parser';
+import { parseMainManifest, parseVariantManifest } from '@mtngtools/hls-parser';
 
 describe('HlsParser', () => {
   const mockContext: TransferContext = {
     config: {
       source: {
         mode: 'fetch',
-        config: { url: 'https://example.com/master.m3u8' },
+        config: { url: 'https://example.com/main.m3u8' },
       },
       destination: {
         mode: 'file',
@@ -38,18 +38,18 @@ describe('HlsParser', () => {
     vi.clearAllMocks();
   });
 
-  it('should parse master manifest', async () => {
+  it('should parse main manifest', async () => {
     const mockManifest = {
       variants: [],
       version: 3,
     };
 
-    vi.mocked(parseMasterManifest).mockResolvedValue(mockManifest as never);
+    vi.mocked(parseMainManifest).mockResolvedValue(mockManifest as never);
 
     const parser = new HlsParser();
-    const result = await parser.parseMasterManifest('#EXTM3U', mockContext);
+    const result = await parser.parseMainManifest('#EXTM3U', mockContext);
 
-    expect(parseMasterManifest).toHaveBeenCalledWith('#EXTM3U', mockContext);
+    expect(parseMainManifest).toHaveBeenCalledWith('#EXTM3U', mockContext);
     expect(result).toEqual(mockManifest);
   });
 

@@ -49,8 +49,8 @@ describe('TransferJobExecutor Integration Tests', () => {
 
   it('should execute full transfer pipeline', async () => {
     // Load test fixtures
-    const masterManifest = readFileSync(
-      resolve(fixturesDir, 'master.m3u8'),
+    const mainManifest = readFileSync(
+      resolve(fixturesDir, 'main.m3u8'),
       'utf-8',
     );
     const variantManifest = readFileSync(
@@ -66,7 +66,7 @@ describe('TransferJobExecutor Integration Tests', () => {
 
     // Setup HTTP handlers
     const handlers = createHandlers({
-      masterManifest,
+      mainManifest,
       variantManifests: {
         'variant1.m3u8': variantManifest,
       },
@@ -87,7 +87,7 @@ describe('TransferJobExecutor Integration Tests', () => {
       source: {
         mode: 'fetch',
         config: {
-          url: 'https://example.com/master.m3u8',
+          url: 'https://example.com/main.m3u8',
         },
         concurrency: {
           maxConcurrent: 2,
@@ -128,11 +128,11 @@ describe('TransferJobExecutor Integration Tests', () => {
 
     // Create transfer job executor
     const executor = new TransferJobExecutor(job, pipelineExecutor);
-    
+
     // Filter variants to only process variant1 (since we only set up handlers for it)
     const executorInternal = executor as unknown as { executor: { filterVariants: (context: unknown) => Promise<unknown[]> } };
     const originalFilter = executorInternal.executor.filterVariants;
-    executorInternal.executor.filterVariants = async function(context: unknown) {
+    executorInternal.executor.filterVariants = async function (context: unknown) {
       const allVariants = await originalFilter.call(this, context);
       // Filter to only variant1
       return allVariants.filter((v: unknown) => {
@@ -146,15 +146,15 @@ describe('TransferJobExecutor Integration Tests', () => {
     // Execute transfer
     await executor.execute();
 
-    // Verify master manifest was stored
-    const storedMaster = mockStorage.getStoredFile('/tmp/hls-output/master.m3u8');
-    expect(storedMaster).toBeDefined();
-    expect(storedMaster).toContain('#EXTM3U');
+    // Verify main manifest was stored
+    const storedMain = mockStorage.getStoredFile('/tmp/hls-output/main.m3u8');
+    expect(storedMain).toBeDefined();
+    expect(storedMain).toContain('#EXTM3U');
 
-    // Verify source manifest copy was stored for master
-    const storedMasterSource = mockStorage.getStoredFile('/tmp/hls-output/master.m3u8.source.txt');
-    expect(storedMasterSource).toBeDefined();
-    expect(storedMasterSource).toBe(masterManifest);
+    // Verify source manifest copy was stored for main
+    const storedMainSource = mockStorage.getStoredFile('/tmp/hls-output/main.m3u8.source.txt');
+    expect(storedMainSource).toBeDefined();
+    expect(storedMainSource).toBe(mainManifest);
 
     // Verify variant manifest was stored
     const storedVariant = mockStorage.getStoredFile('/tmp/hls-output/variant1.m3u8');
@@ -167,10 +167,10 @@ describe('TransferJobExecutor Integration Tests', () => {
     expect(storedVariantSource).toBe(variantManifest);
 
     // Verify chunks were stored
-    expect(mockStorage.getStoredFile('/tmp/hls-output/segment001.ts')).toBeDefined();
-    expect(mockStorage.getStoredFile('/tmp/hls-output/segment002.ts')).toBeDefined();
-    expect(mockStorage.getStoredFile('/tmp/hls-output/segment003.ts')).toBeDefined();
-    expect(mockStorage.getStoredFile('/tmp/hls-output/segment004.ts')).toBeDefined();
+    expect(mockStorage.getStoredFile('/tmp/hls-output/001.ts')).toBeDefined();
+    expect(mockStorage.getStoredFile('/tmp/hls-output/002.ts')).toBeDefined();
+    expect(mockStorage.getStoredFile('/tmp/hls-output/003.ts')).toBeDefined();
+    expect(mockStorage.getStoredFile('/tmp/hls-output/004.ts')).toBeDefined();
 
     // Verify progress callbacks were called
     expect(job.options.onOverallProgress).toHaveBeenCalled();
@@ -178,8 +178,8 @@ describe('TransferJobExecutor Integration Tests', () => {
   });
 
   it('should handle multiple variants', async () => {
-    const masterManifest = readFileSync(
-      resolve(fixturesDir, 'master.m3u8'),
+    const mainManifest = readFileSync(
+      resolve(fixturesDir, 'main.m3u8'),
       'utf-8',
     );
     const variantManifest = readFileSync(
@@ -189,7 +189,7 @@ describe('TransferJobExecutor Integration Tests', () => {
 
     // Setup handlers for all 3 variants with chunks
     const handlers = createHandlers({
-      masterManifest,
+      mainManifest,
       variantManifests: {
         'variant1.m3u8': variantManifest,
         'variant2.m3u8': variantManifest,
@@ -210,7 +210,7 @@ describe('TransferJobExecutor Integration Tests', () => {
       source: {
         mode: 'fetch',
         config: {
-          url: 'https://example.com/master.m3u8',
+          url: 'https://example.com/main.m3u8',
         },
         concurrency: {
           maxConcurrent: 2,
@@ -247,7 +247,7 @@ describe('TransferJobExecutor Integration Tests', () => {
     const lastProgress = progressCalls[progressCalls.length - 1]?.[0];
     expect(lastProgress?.completedVariants).toBe(3);
     expect(lastProgress?.totalVariants).toBe(3);
-    
+
     // Verify variant manifests were stored
     expect(mockStorage.getStoredFile('/tmp/hls-output/variant1.m3u8')).toBeDefined();
     expect(mockStorage.getStoredFile('/tmp/hls-output/variant2.m3u8')).toBeDefined();
@@ -255,8 +255,8 @@ describe('TransferJobExecutor Integration Tests', () => {
   });
 
   it('should handle errors gracefully', async () => {
-    const masterManifest = readFileSync(
-      resolve(fixturesDir, 'master.m3u8'),
+    const mainManifest = readFileSync(
+      resolve(fixturesDir, 'main.m3u8'),
       'utf-8',
     );
     const variantManifest = readFileSync(
@@ -273,8 +273,8 @@ describe('TransferJobExecutor Integration Tests', () => {
     const pipelineExecutor = new DefaultPipelineExecutor(defaults, {
       filterVariants: async (context) => {
         // Only process variant1
-        if (context.masterManifest) {
-          return context.masterManifest.variants.filter((v) => v.uri === 'variant1.m3u8');
+        if (context.mainManifest) {
+          return context.mainManifest.variants.filter((v) => v.uri === 'variant1.m3u8');
         }
         return [];
       },
@@ -282,7 +282,7 @@ describe('TransferJobExecutor Integration Tests', () => {
 
     // Setup handlers with one chunk that will fail (segment002.ts missing)
     const handlers = createHandlers({
-      masterManifest,
+      mainManifest,
       variantManifests: {
         'variant1.m3u8': variantManifest,
       },
@@ -301,7 +301,7 @@ describe('TransferJobExecutor Integration Tests', () => {
       source: {
         mode: 'fetch',
         config: {
-          url: 'https://example.com/master.m3u8',
+          url: 'https://example.com/main.m3u8',
         },
         retry: {
           maxRetries: 0, // No retries for faster test
@@ -332,8 +332,8 @@ describe('TransferJobExecutor Integration Tests', () => {
   });
 
   it('should respect concurrency limits', async () => {
-    const masterManifest = readFileSync(
-      resolve(fixturesDir, 'master.m3u8'),
+    const mainManifest = readFileSync(
+      resolve(fixturesDir, 'main.m3u8'),
       'utf-8',
     );
     const variantManifest = readFileSync(
@@ -362,7 +362,7 @@ describe('TransferJobExecutor Integration Tests', () => {
     );
 
     const handlers = createHandlers({
-      masterManifest,
+      mainManifest,
       variantManifests: {
         'variant1.m3u8': variantManifest,
       },
@@ -376,7 +376,7 @@ describe('TransferJobExecutor Integration Tests', () => {
       source: {
         mode: 'fetch',
         config: {
-          url: 'https://example.com/master.m3u8',
+          url: 'https://example.com/main.m3u8',
         },
         concurrency: {
           maxConcurrent: 2, // Limit to 2 concurrent downloads
@@ -400,8 +400,8 @@ describe('TransferJobExecutor Integration Tests', () => {
     };
     const concurrencyPipelineExecutor = new DefaultPipelineExecutor(concurrencyDefaults, {
       filterVariants: async (context) => {
-        if (context.masterManifest) {
-          return context.masterManifest.variants.filter((v) => v.uri === 'variant1.m3u8');
+        if (context.mainManifest) {
+          return context.mainManifest.variants.filter((v) => v.uri === 'variant1.m3u8');
         }
         return [];
       },

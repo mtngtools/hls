@@ -14,7 +14,7 @@ import { ValidationError } from '@mtngtools/hls-types';
  *
  * @example
  * ```ts
- * resolveUrl('https://example.com/path/master.m3u8', 'variant.m3u8')
+ * resolveUrl('https://example.com/path/main.m3u8', 'variant.m3u8')
  * // => 'https://example.com/path/variant.m3u8'
  * ```
  */

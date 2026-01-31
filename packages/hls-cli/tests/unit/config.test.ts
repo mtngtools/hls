@@ -21,7 +21,7 @@ describe('loadConfig', () => {
   it('should load valid JSON config file', () => {
     const configContent = JSON.stringify({
       source: {
-        url: 'https://example.com/master.m3u8',
+        url: 'https://example.com/main.m3u8',
         headers: { 'User-Agent': 'test' },
       },
     });
@@ -31,7 +31,7 @@ describe('loadConfig', () => {
     const config = loadConfig('./config.json');
     expect(config).toEqual({
       source: {
-        url: 'https://example.com/master.m3u8',
+        url: 'https://example.com/main.m3u8',
         headers: { 'User-Agent': 'test' },
       },
     });
@@ -59,34 +59,34 @@ describe('loadConfig', () => {
 describe('createTransferConfig', () => {
   it('should create config from args only', () => {
     const args = {
-      source: 'https://example.com/master.m3u8',
+      source: 'https://example.com/main.m3u8',
       destination: '/output',
     };
 
     const config = createTransferConfig(args);
 
     expect(config.source.mode).toBe('fetch');
-    expect(config.source.config.url).toBe('https://example.com/master.m3u8');
+    expect((config.source.config as any).url).toBe('https://example.com/main.m3u8');
     expect(config.destination.mode).toBe('file');
-    expect(config.destination.config.path).toBe('/output');
+    expect((config.destination.config as any).path).toBe('/output');
   });
 
   it('should use defaults for concurrency and retry', () => {
     const args = {
-      source: 'https://example.com/master.m3u8',
+      source: 'https://example.com/main.m3u8',
       destination: '/output',
     };
 
     const config = createTransferConfig(args);
 
-    expect(config.source.concurrency.maxConcurrent).toBe(5);
-    expect(config.source.retry.maxRetries).toBe(3);
-    expect(config.source.retry.retryDelay).toBe(1000);
+    expect(config.source.concurrency?.maxConcurrent).toBe(5);
+    expect(config.source.retry?.maxRetries).toBe(3);
+    expect(config.source.retry?.retryDelay).toBe(1000);
   });
 
   it('should use args for concurrency and retry when provided', () => {
     const args = {
-      source: 'https://example.com/master.m3u8',
+      source: 'https://example.com/main.m3u8',
       destination: '/output',
       maxConcurrent: 10,
       maxRetries: 5,
@@ -95,14 +95,14 @@ describe('createTransferConfig', () => {
 
     const config = createTransferConfig(args);
 
-    expect(config.source.concurrency.maxConcurrent).toBe(10);
-    expect(config.source.retry.maxRetries).toBe(5);
-    expect(config.source.retry.retryDelay).toBe(2000);
+    expect(config.source.concurrency?.maxConcurrent).toBe(10);
+    expect(config.source.retry?.maxRetries).toBe(5);
+    expect(config.source.retry?.retryDelay).toBe(2000);
   });
 
   it('should merge config file with args', () => {
     const args = {
-      source: 'https://example.com/master.m3u8',
+      source: 'https://example.com/main.m3u8',
       destination: '/output',
       maxConcurrent: 10,
     };
@@ -123,42 +123,42 @@ describe('createTransferConfig', () => {
     const config = createTransferConfig(args, fileConfig);
 
     // Args override config file
-    expect(config.source.concurrency.maxConcurrent).toBe(10);
+    expect(config.source.concurrency?.maxConcurrent).toBe(10);
     // Config file provides defaults
-    expect(config.source.config.headers).toEqual({ 'User-Agent': 'test' });
-    expect(config.source.config.timeout).toBe(60000);
+    expect((config.source.config as any).headers).toEqual({ 'User-Agent': 'test' });
+    expect((config.source.config as any).timeout).toBe(60000);
     // File mode doesn't support headers, so destination config should only have path
     expect(config.destination.mode).toBe('file');
-    expect(config.destination.config.path).toBe('/output');
+    expect((config.destination.config as any).path).toBe('/output');
   });
 
   it('should detect URL destination', () => {
     const args = {
-      source: 'https://example.com/master.m3u8',
+      source: 'https://example.com/main.m3u8',
       destination: 'https://cdn2.com/output',
     };
 
     const config = createTransferConfig(args);
 
     expect(config.destination.mode).toBe('fetch');
-    expect(config.destination.config.url).toBe('https://cdn2.com/output');
+    expect((config.destination.config as any).url).toBe('https://cdn2.com/output');
   });
 
   it('should use file mode for non-URL destination', () => {
     const args = {
-      source: 'https://example.com/master.m3u8',
+      source: 'https://example.com/main.m3u8',
       destination: '/local/output',
     };
 
     const config = createTransferConfig(args);
 
     expect(config.destination.mode).toBe('file');
-    expect(config.destination.config.path).toBe('/local/output');
+    expect((config.destination.config as any).path).toBe('/local/output');
   });
 
   it('should respect config file destination mode', () => {
     const args = {
-      source: 'https://example.com/master.m3u8',
+      source: 'https://example.com/main.m3u8',
       destination: '/local/output',
     };
 
@@ -172,18 +172,18 @@ describe('createTransferConfig', () => {
     const config = createTransferConfig(args, fileConfig);
 
     expect(config.destination.mode).toBe('fetch');
-    expect(config.destination.config.url).toBe('https://cdn2.com/output');
+    expect((config.destination.config as any).url).toBe('https://cdn2.com/output');
   });
 
   it('should handle HTTP URLs', () => {
     const args = {
-      source: 'https://example.com/master.m3u8',
+      source: 'https://example.com/main.m3u8',
       destination: 'http://example.com/output',
     };
 
     const config = createTransferConfig(args);
 
     expect(config.destination.mode).toBe('fetch');
-    expect(config.destination.config.url).toBe('http://example.com/output');
+    expect((config.destination.config as any).url).toBe('http://example.com/output');
   });
 });

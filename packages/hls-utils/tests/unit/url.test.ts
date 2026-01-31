@@ -8,27 +8,27 @@ import { ValidationError } from '@mtngtools/hls-types';
 
 describe('resolveUrl', () => {
   it('should resolve relative URL against base URL', () => {
-    const result = resolveUrl('https://example.com/path/master.m3u8', 'variant.m3u8');
+    const result = resolveUrl('https://example.com/path/main.m3u8', 'variant.m3u8');
     expect(result).toBe('https://example.com/path/variant.m3u8');
   });
 
-  it('should resolve absolute URL (returns as-is)', () => {
-    const result = resolveUrl('https://example.com/path/master.m3u8', 'https://other.com/variant.m3u8');
+  it('should resolve absolute URLs', () => {
+    const result = resolveUrl('https://example.com/path/main.m3u8', 'https://other.com/variant.m3u8');
     expect(result).toBe('https://other.com/variant.m3u8');
   });
 
-  it('should resolve relative path with parent directory', () => {
-    const result = resolveUrl('https://example.com/path/master.m3u8', '../other/variant.m3u8');
+  it('should handle parent directory references', () => {
+    const result = resolveUrl('https://example.com/path/main.m3u8', '../other/variant.m3u8');
     expect(result).toBe('https://example.com/other/variant.m3u8');
   });
 
-  it('should resolve relative path with subdirectory', () => {
-    const result = resolveUrl('https://example.com/path/master.m3u8', 'sub/variant.m3u8');
+  it('should handle subdirectories', () => {
+    const result = resolveUrl('https://example.com/path/main.m3u8', 'sub/variant.m3u8');
     expect(result).toBe('https://example.com/path/sub/variant.m3u8');
   });
 
   it('should handle root-relative paths', () => {
-    const result = resolveUrl('https://example.com/path/master.m3u8', '/root/variant.m3u8');
+    const result = resolveUrl('https://example.com/path/main.m3u8', '/root/variant.m3u8');
     expect(result).toBe('https://example.com/root/variant.m3u8');
   });
 
@@ -37,30 +37,32 @@ describe('resolveUrl', () => {
       resolveUrl('not-a-url', 'variant.m3u8');
     }).toThrow(ValidationError);
   });
+});
 
-  it('should resolve empty string as base URL', () => {
-    const result = resolveUrl('https://example.com/path/master.m3u8', '');
-    expect(result).toBe('https://example.com/path/master.m3u8');
+describe('joinUrl', () => {
+  it('should join base URL and path', () => {
+    const result = resolveUrl('https://example.com/path/main.m3u8', '');
+    expect(result).toBe('https://example.com/path/main.m3u8');
   });
 });
 
 describe('parseHlsUrl', () => {
-  it('should parse valid HTTP URL', () => {
-    const result = parseHlsUrl('https://example.com/path/master.m3u8');
-    expect(result).not.toBeNull();
-    expect(result?.href).toBe('https://example.com/path/master.m3u8');
+  it('should parse valid HLS URL', () => {
+    const result = parseHlsUrl('https://example.com/path/main.m3u8');
+    expect(result).toBeDefined();
+    expect(result?.href).toBe('https://example.com/path/main.m3u8');
     expect(result?.protocol).toBe('https:');
   });
 
-  it('should parse valid HTTP URL', () => {
-    const result = parseHlsUrl('http://example.com/path/master.m3u8');
-    expect(result).not.toBeNull();
-    expect(result?.href).toBe('http://example.com/path/master.m3u8');
+  it('should handle http scheme', () => {
+    const result = parseHlsUrl('http://example.com/path/main.m3u8');
+    expect(result).toBeDefined();
+    expect(result?.href).toBe('http://example.com/path/main.m3u8');
     expect(result?.protocol).toBe('http:');
   });
 
-  it('should parse file URL', () => {
-    const result = parseHlsUrl('file:///path/to/master.m3u8');
+  it('should handle file scheme', () => {
+    const result = parseHlsUrl('file:///path/to/main.m3u8');
     expect(result).not.toBeNull();
     expect(result?.protocol).toBe('file:');
   });

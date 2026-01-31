@@ -26,31 +26,39 @@ This package is the pure orchestration layer for HLS operations. It defines the 
 2.  **Transfer Context (`Context`)**:
     *   Accept and maintain a request state.
     *   Hold configuration.
-    *   `masterManifest` (once it's available)
+    *   `mainManifest` (once it's available)
     *   `filteredVariants` (once it's available)
     *   Support arbitrary metadata storage.
     *   *Note*: Progress is tracked via callbacks, not stored in the context state.
 
-2.  **Orchestration Pipeline**:
+234.  **Orchestration Pipeline**:
     *  These steps represent the lifecycle of a transfer job:
-    *   **Step 1: Fetch Master Manifest**: `(url, context) => Promise<Response>`        
-    *   **Step 2: Parse Master Manifest**: `(content, context) => Promise<MasterManifest>`
+    *   **Step 1: Fetch Main Manifest**: `(url, context) => Promise<Response>`        
+    *   **Step 2: Parse Main Manifest**: `(content, context) => Promise<MainManifest>`
     *   **Step 4: Filter Variants**: `(context) => Promise<Variant[]>`
     *   **Step 5: Fetch Variant Manifest**: `(variant, context) => Promise<Response>`
-    *   **Step 5: Parse Variant Manifest**: `(content, variant, context) => Promise<VariantManifest>`
-    *   **Step 6: Chunk Discovery**: `(manifest, variant, context) => Promise<Chunk[]>`
-    *   **Step 7: Chunk Filter**: `(manifest, variant, chunks, context) => Promise<Chunk[]>`
-    *   **Step 8: Create Destination Master Manifest**: `(context) => Promise<string>`
-    *   **Step 9: Generate Master Manifest Path**: `(sourcePath, manifest, context) => Promise<string>`
-    *   **Step 10: Store Manifest**: `(manifest, path, context) => Promise<void>`
-        * Use at this step for `MasterManifest` and between 12 and 13 for `VariantManifest`
-        * **Default behavior**: When storing the destination manifest at `path`, the pipeline MUST also store a copy of the raw source manifest content to a companion path.
-        * **Path convention**: `{path}.source.txt` (e.g., `master.m3u8` → `master.m3u8.source.txt`, `variant1.m3u8` → `variant1.m3u8.source.txt`).
-        * **Source content**: Read from `manifest.sourceContent` (populated by parser). If missing, skip the source copy (e.g., when a plugin provides a manifest without sourceContent).
-        * **Configurability**: This is default behavior; plugins may override `storeManifest` to change or disable it.
-    *   **Step 11: Create Destination Variant Manifest**: `(chunks, variant, context) => Promise<string>`
-    *   **Step 12: Generate Master Manifest Path**: `(sourcePath, manifest, context) => Promise<string>`
-    *   **Step 12: Download Chunk**: `(chunk, context) => Promise<Stream>`
-    *   **Step 13: Generate Chunk Path**: `(sourcePath, variant, chunk, context) => Promise<string>`
-    *   **Step 14: Store Chunk**: `(stream, path, chunk, context) => Promise<void>`
-    *   **Step 15: Finalize**: `(context) => Promise<void>` (Hook for logging, notifications, or post-processing like MP4 muxing).
+        *   **Requirement**: If `variant.uri` is an absolute URL, it MUST be used as-is, ignoring the main manifest base URL.
+    *   **Step 6: Parse Variant Manifest**: `(content, variant, context) => Promise<VariantManifest>`
+    *   **Step 7: Chunk Discovery**: `(manifest, variant, context) => Promise<Chunk[]>`
+    *   **Step 8: Filter Chunks**: `(manifest, variant, chunks, context) => Promise<Chunk[]>`
+    *   **Step 9: Create Destination Main Manifest**: `(context) => Promise<string>`
+        *   **Requirement**: The generated manifest must rewritten to reference the new destination paths of the variants (e.g., using relative paths to subfolders).
+    *   **Step 10: Generate Main Manifest Path**: `(sourcePath, manifest, context) => Promise<string>`
+    *   **Step 11: Store Main Manifest**: `(manifest, path, context) => Promise<void>`
+        * Use at this step for `MainManifest` (and later for `VariantManifest`).
+        * **Default behavior**: Store a copy of the raw source manifest content to a companion path.
+        * **Path convention**: `{path}.source.txt`.
+    *   **Step 12: Create Destination Variant Manifest**: `(chunks, variant, context) => Promise<string>`
+        *   **Requirement**: The generated manifest must be rewritten to reference the new destination filenames of the chunks (standardized names).
+    *   **Step 13: Generate Variant Manifest Path**: `(sourcePath, variant, context) => Promise<string>`
+        *   **Requirement**: If the variant source was an absolute URL, or if there is a risk of filename collision, the destination path SHOULD use a subfolder structure (e.g., `/{bandwidth}/index.m3u8` or similar) to ensure uniqueness.
+    *   **Step 14: Download Chunk**: `(chunk, context) => Promise<Stream>`
+        *   **Requirement**: If `chunk.uri` is an absolute URL, it MUST be used as-is.
+    *   **Step 15: Generate Chunk Path**: `(sourcePath, variant, manifest, chunk, context) => Promise<string>`
+        *   **Requirement**: Chunk filenames MUST be simple and clean.
+            *   If the source URL contains a filename like `{number}.ts`, use it (ignoring query parameters).
+            *   Otherwise, generate a simple name using the chunk's index in the manifest (e.g., `0.ts`, `1.ts`).
+            *   Query parameters MUST be ignored for the filename.
+            *   Filenames MUST be unique across the transfer job (achieved via subfolders per variant).
+    *   **Step 16: Store Chunk**: `(stream, path, chunk, context) => Promise<void>`
+    *   **Step 17: Finalize**: `(context) => Promise<void>`

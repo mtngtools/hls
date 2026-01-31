@@ -3,7 +3,7 @@
  * Used by @mtngtools/hls-core
  */
 
-import type { MasterManifest, Variant, VariantManifest, Chunk } from './parser.js';
+import type { MainManifest, Variant, VariantManifest, Chunk } from './parser.js';
 import type { TransferConfig } from './transfer.js';
 
 /**
@@ -58,8 +58,8 @@ export interface TransferJobOptions {
 export interface TransferContext {
   /** Transfer configuration */
   config: TransferConfig;
-  /** Master manifest (available after step 2) */
-  masterManifest?: MasterManifest;
+  /** Main manifest (available after step 2) */
+  mainManifest?: MainManifest;
   /** Filtered variants (available after step 3) */
   filteredVariants?: Variant[];
   /** Arbitrary metadata storage */
@@ -135,12 +135,12 @@ export interface Storage {
  */
 export interface Parser {
   /**
-   * Parse a master manifest
+   * Parse a main manifest
    * @param content - Manifest content as string
    * @param context - Transfer context
-   * @returns Promise resolving to parsed master manifest
+   * @returns Promise resolving to parsed main manifest
    */
-  parseMasterManifest(content: string, context: TransferContext): Promise<MasterManifest>;
+  parseMainManifest(content: string, context: TransferContext): Promise<MainManifest>;
 
   /**
    * Parse a variant manifest
@@ -160,17 +160,17 @@ export interface Parser {
  * Plugin interface for overriding pipeline steps
  */
 export interface TransferPlugins {
-  /** Step 1: Fetch Master Manifest */
-  fetchMasterManifest?: (
+  /** Step 1: Fetch Main Manifest */
+  fetchMainManifest?: (
     url: string,
     context: TransferContext,
   ) => Promise<FetchResponse>;
 
-  /** Step 2: Parse Master Manifest */
-  parseMasterManifest?: (
+  /** Step 2: Parse Main Manifest */
+  parseMainManifest?: (
     content: string,
     context: TransferContext,
-  ) => Promise<MasterManifest>;
+  ) => Promise<MainManifest>;
 
   /** Step 3: Filter Variants */
   filterVariants?: (context: TransferContext) => Promise<Variant[]>;
@@ -203,19 +203,19 @@ export interface TransferPlugins {
     context: TransferContext,
   ) => Promise<Chunk[]>;
 
-  /** Step 8: Create Destination Master Manifest */
-  createDestinationMasterManifest?: (context: TransferContext) => Promise<string>;
+  /** Step 8: Create Destination Main Manifest */
+  createDestinationMainManifest?: (context: TransferContext) => Promise<string>;
 
-  /** Step 9: Generate Master Manifest Path */
-  generateMasterManifestPath?: (
+  /** Step 9: Generate Main Manifest Path */
+  generateMainManifestPath?: (
     sourcePath: string,
-    manifest: MasterManifest,
+    manifest: MainManifest,
     context: TransferContext,
   ) => Promise<string>;
 
   /** Step 10: Store Manifest */
   storeManifest?: (
-    manifest: MasterManifest | VariantManifest,
+    manifest: MainManifest | VariantManifest,
     path: string,
     context: TransferContext,
   ) => Promise<void>;
@@ -244,6 +244,7 @@ export interface TransferPlugins {
   generateChunkPath?: (
     sourcePath: string,
     variant: Variant,
+    manifest: VariantManifest,
     chunk: Chunk,
     context: TransferContext,
   ) => Promise<string>;
@@ -279,11 +280,11 @@ export interface DefaultImplementations {
  * with automatic fallback to defaults when plugins don't override
  */
 export interface PipelineExecutor {
-  /** Step 1: Fetch Master Manifest */
-  fetchMasterManifest(url: string, context: TransferContext): Promise<FetchResponse>;
+  /** Step 1: Fetch Main Manifest */
+  fetchMainManifest(url: string, context: TransferContext): Promise<FetchResponse>;
 
-  /** Step 2: Parse Master Manifest */
-  parseMasterManifest(content: string, context: TransferContext): Promise<MasterManifest>;
+  /** Step 2: Parse Main Manifest */
+  parseMainManifest(content: string, context: TransferContext): Promise<MainManifest>;
 
   /** Step 3: Filter Variants */
   filterVariants(context: TransferContext): Promise<Variant[]>;
@@ -313,19 +314,19 @@ export interface PipelineExecutor {
     context: TransferContext,
   ): Promise<Chunk[]>;
 
-  /** Step 8: Create Destination Master Manifest */
-  createDestinationMasterManifest(context: TransferContext): Promise<string>;
+  /** Step 8: Create Destination Main Manifest */
+  createDestinationMainManifest(context: TransferContext): Promise<string>;
 
-  /** Step 9: Generate Master Manifest Path */
-  generateMasterManifestPath(
+  /** Step 9: Generate Main Manifest Path */
+  generateMainManifestPath(
     sourcePath: string,
-    manifest: MasterManifest,
+    manifest: MainManifest,
     context: TransferContext,
   ): Promise<string>;
 
   /** Step 10: Store Manifest */
   storeManifest(
-    manifest: MasterManifest | VariantManifest,
+    manifest: MainManifest | VariantManifest,
     path: string,
     context: TransferContext,
   ): Promise<void>;
@@ -351,6 +352,7 @@ export interface PipelineExecutor {
   generateChunkPath(
     sourcePath: string,
     variant: Variant,
+    manifest: VariantManifest,
     chunk: Chunk,
     context: TransferContext,
   ): Promise<string>;

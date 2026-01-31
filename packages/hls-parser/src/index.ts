@@ -1,25 +1,25 @@
 /**
  * @mtngtools/hls-parser
- * HLS manifest parser for master and variant manifests
+ * HLS manifest parser for main and variant manifests
  */
 
-import type { MasterManifest, VariantManifest, Variant } from '@mtngtools/hls-types';
+import type { MainManifest, VariantManifest, Variant } from '@mtngtools/hls-types';
 import type { TransferContext } from '@mtngtools/hls-types';
-import { parseMasterManifest as parseMasterManifestImpl } from './master-parser.js';
+import { parseMainManifest as parseMainManifestImpl } from './main-parser.js';
 import { parseVariantManifest as parseVariantManifestImpl } from './variant-parser.js';
 
 /**
- * Parse a master manifest from M3U8 content
+ * Parse a main manifest from M3U8 content
  *
  * @param content - M3U8 manifest content
  * @param context - Transfer context
- * @returns Parsed master manifest
+ * @returns Parsed main manifest
  */
-export function parseMasterManifest(
+export function parseMainManifest(
   content: string,
   context: TransferContext,
-): Promise<MasterManifest> {
-  return Promise.resolve(parseMasterManifestImpl(content, context));
+): Promise<MainManifest> {
+  return Promise.resolve(parseMainManifestImpl(content, context));
 }
 
 /**
@@ -37,6 +37,6 @@ export function parseVariantManifest(
 ): Promise<VariantManifest> {
   return Promise.resolve(parseVariantManifestImpl(content, variant, context));
 }// Re-export parser implementation for direct use if needed
-export { parseMasterManifest as parseMasterManifestSync } from './master-parser.js';
+export { parseMainManifest as parseMainManifestSync } from './main-parser.js';
 export { parseVariantManifest as parseVariantManifestSync } from './variant-parser.js';
 export { tokenize } from './tokenizer.js';

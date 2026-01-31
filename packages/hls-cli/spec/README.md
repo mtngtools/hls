@@ -30,7 +30,7 @@ The CLI provides sensible defaults for all configuration options. These defaults
 
 ### Error Recovery Strategy
 
-The transfer job continues processing remaining variants and chunks when individual items fail. Failed items are reported via the `onError` callback, but the transfer does not abort unless a critical error occurs (e.g., master manifest fetch failure).
+The transfer job continues processing remaining variants and chunks when individual items fail. Failed items are reported via the `onError` callback, but the transfer does not abort unless a critical error occurs (e.g., main manifest fetch failure).
 
 **Note**: Error recovery behavior (continue vs abort) is currently not configurable and defaults to "continue on error". This may be made configurable in future versions.
 

@@ -15,7 +15,7 @@ One epic per major feature area:
 
 ### 2. Feature Issues (Specific functionality)
 Break epics into features:
-- Feature: Master Manifest Parsing
+- Feature: Main Manifest Parsing
 - Feature: Variant Manifest Parsing
 - Feature: Chunk Discovery
 - Feature: HTTP Header Management
@@ -23,8 +23,8 @@ Break epics into features:
 
 ### 3. Task Issues (Implementation details)
 Break features into tasks:
-- Task: Implement M3U8 parser for master manifests
-- Task: Add TypeScript types for MasterManifest
+- Task: Implement M3U8 parser for main manifests
+- Task: Add TypeScript types for MainManifest
 - Task: Create plugin interface for manifest parsing
 
 ## Issue Templates

@@ -60,20 +60,20 @@ export class TransferJobExecutor {
    */
   async execute(): Promise<void> {
     try {
-      // Step 1: Fetch Master Manifest
-      const masterUrl = this.getMasterManifestUrl();
-      const masterResponse = await this.executor.fetchMasterManifest(
-        masterUrl,
+      // Step 1: Fetch Main Manifest
+      const mainUrl = this.getMainManifestUrl();
+      const mainResponse = await this.executor.fetchMainManifest(
+        mainUrl,
         this.context,
       );
 
-      // Step 2: Parse Master Manifest
-      const masterContent = await masterResponse.text();
-      const masterManifest = await this.executor.parseMasterManifest(
-        masterContent,
+      // Step 2: Parse Main Manifest
+      const mainContent = await mainResponse.text();
+      const mainManifest = await this.executor.parseMainManifest(
+        mainContent,
         this.context,
       );
-      this.context.masterManifest = masterManifest;
+      this.context.mainManifest = mainManifest;
 
       // Step 3: Filter Variants
       const filteredVariants = await this.executor.filterVariants(
@@ -84,20 +84,20 @@ export class TransferJobExecutor {
       // Initialize progress tracking for variants
       this.initializeProgress(filteredVariants);
 
-      // Step 8: Create Destination Master Manifest
-      await this.executor.createDestinationMasterManifest(this.context);
+      // Step 8: Create Destination Main Manifest
+      await this.executor.createDestinationMainManifest(this.context);
 
-      // Step 9: Generate Master Manifest Path
-      const masterPath = await this.executor.generateMasterManifestPath(
-        masterUrl,
-        masterManifest,
+      // Step 9: Generate Main Manifest Path
+      const mainPath = await this.executor.generateMainManifestPath(
+        mainUrl,
+        mainManifest,
         this.context,
       );
 
-      // Step 10: Store Master Manifest
+      // Step 10: Store Main Manifest
       await this.executor.storeManifest(
-        masterManifest,
-        masterPath,
+        mainManifest,
+        mainPath,
         this.context,
       );
 
@@ -113,9 +113,9 @@ export class TransferJobExecutor {
   }
 
   /**
-   * Get master manifest URL from source config
+   * Get main manifest URL from source config
    */
-  private getMasterManifestUrl(): string {
+  private getMainManifestUrl(): string {
     const sourceConfig = this.context.config.source;
     if (sourceConfig.mode === 'fetch' && 'url' in sourceConfig.config) {
       return sourceConfig.config.url;
@@ -159,8 +159,8 @@ export class TransferJobExecutor {
     try {
       // Step 4: Fetch Variant Manifest
       // Resolve variant URL and store in context for chunk URI resolution
-      const masterUrl = this.getMasterManifestUrl();
-      const variantUrl = new URL(variant.uri, masterUrl).href;
+      const mainUrl = this.getMainManifestUrl();
+      const variantUrl = new URL(variant.uri, mainUrl).href;
       this.context.metadata.variantUrl = variantUrl;
 
       const variantResponse = await this.sourceSemaphore.execute(() =>
@@ -240,7 +240,7 @@ export class TransferJobExecutor {
     _manifest: VariantManifest,
   ): Promise<void> {
     const chunkPromises = chunks.map((chunk) =>
-      this.processChunk(chunk, variant),
+      this.processChunk(chunk, variant, _manifest),
     );
 
     await Promise.all(chunkPromises);
@@ -249,7 +249,11 @@ export class TransferJobExecutor {
   /**
    * Process a single chunk with retry logic
    */
-  private async processChunk(chunk: Chunk, variant: Variant): Promise<void> {
+  private async processChunk(
+    chunk: Chunk,
+    variant: Variant,
+    manifest: VariantManifest,
+  ): Promise<void> {
     const retryConfig = this.context.config.source.retry ?? {
       maxRetries: 3,
       retryDelay: 1000,
@@ -268,6 +272,7 @@ export class TransferJobExecutor {
         const chunkPath = await this.executor.generateChunkPath(
           chunk.uri,
           variant,
+          manifest,
           chunk,
           this.context,
         );

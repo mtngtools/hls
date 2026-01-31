@@ -5,7 +5,7 @@
 import { describe, it, expect } from 'vitest';
 import { DefaultPipelineExecutor } from '../../src/pipeline.js';
 import { MockStorage } from '../integration/helpers.js';
-import type { DefaultImplementations, TransferContext, MasterManifest } from '@mtngtools/hls-types';
+import type { DefaultImplementations, TransferContext, MainManifest } from '@mtngtools/hls-types';
 import { OfetchFetcher } from '@mtngtools/hls-transfer';
 import { HlsParser } from '../../src/parser.js';
 
@@ -21,25 +21,25 @@ describe('DefaultPipelineExecutor storeManifest', () => {
 
     const context: TransferContext = {
       config: {
-        source: { mode: 'fetch', config: { url: 'https://example.com/master.m3u8' } },
+        source: { mode: 'fetch', config: { url: 'https://example.com/main.m3u8' } },
         destination: { mode: 'file', config: { path: '/tmp/out' } },
       },
       metadata: {},
     };
 
-    const masterManifest: MasterManifest = {
+    const mainManifest: MainManifest = {
       variants: [{ uri: 'v.m3u8', bandwidth: 1000 }],
       sourceContent: '#EXTM3U\n#EXT-X-STREAM-INF:BANDWIDTH=1000\nv.m3u8',
     };
 
-    await executor.storeManifest(masterManifest, '/tmp/out/master.m3u8', context);
+    await executor.storeManifest(mainManifest, '/tmp/out/main.m3u8', context);
 
-    const stored = mockStorage.getStoredFile('/tmp/out/master.m3u8');
+    const stored = mockStorage.getStoredFile('/tmp/out/main.m3u8');
     expect(stored).toBeDefined();
     expect(stored).toContain('#EXTM3U');
 
-    const storedSource = mockStorage.getStoredFile('/tmp/out/master.m3u8.source.txt');
+    const storedSource = mockStorage.getStoredFile('/tmp/out/main.m3u8.source.txt');
     expect(storedSource).toBeDefined();
-    expect(storedSource).toBe(masterManifest.sourceContent);
+    expect(storedSource).toBe(mainManifest.sourceContent);
   });
 });

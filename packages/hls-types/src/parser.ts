@@ -99,9 +99,9 @@ export interface Variant {
 }
 
 /**
- * Master manifest structure
+ * Main manifest structure
  */
-export interface MasterManifest {
+export interface MainManifest {
   /** HLS protocol version */
   version?: number;
   /** Independent segments flag */

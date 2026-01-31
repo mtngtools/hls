@@ -23,7 +23,7 @@ describe('OfetchFetcher', () => {
       source: {
         mode: 'fetch',
         config: {
-          url: 'https://example.com/master.m3u8',
+          url: 'https://example.com/main.m3u8',
           headers: { 'User-Agent': 'test' },
           timeout: 30000,
         },
@@ -204,5 +204,23 @@ describe('OfetchFetcher', () => {
     const result = await fetcher.fetch('https://example.com/test', mockContext);
 
     expect(result.headers).toEqual({ 'content-type': 'text/plain' });
+  });
+
+  it('should handle Blob response (mocking fetch)', async () => {
+    const blob = new Blob(['test blob content'], { type: 'text/plain' });
+    const mockResponse = {
+      _data: blob,
+      headers: new Headers(),
+      status: 200,
+      statusText: 'OK',
+    };
+
+    vi.mocked($fetch.raw).mockResolvedValue(mockResponse as never);
+
+    const result = await fetcher.fetch('https://example.com/blob', mockContext);
+    const buffer = await result.arrayBuffer();
+    const text = new TextDecoder().decode(buffer);
+
+    expect(text).toBe('test blob content');
   });
 });

@@ -7,7 +7,7 @@ This document outlines the high-level architecture and goals for the HLS (HTTP L
 The goal is to build a comprehensive set of utilities for HLS content management, primarily focused on server-side operations.
 
 ### Key Use Cases
-1.  **CDN-to-CDN Transfer**: efficiently moving HLS content between storage locations while managing headers, authentication, and directory structure. By default, a copy of the raw source manifest (master and variant) is stored alongside the transformed destination manifest for audit, debugging, and comparison. Path convention: `{manifestPath}.source.txt`.
+1.  **CDN-to-CDN Transfer**: efficiently moving HLS content between storage locations while managing headers, authentication, and directory structure. By default, a copy of the raw source manifest (main and variant) is stored alongside the transformed destination manifest for audit, debugging, and comparison. Path convention: `{manifestPath}.source.txt`.
 2.  **HLS conversion**: Merging HLS segments into single files (future scope).
 
 ## Technology Stack
@@ -36,7 +36,7 @@ The following packages are listed in their build priority order, which aligns wi
 
 3.  **Parsing** (`@mtngtools/hls-parser`) - [Spec](../packages/hls-parser/spec/README.md)
     *   Implement parsing logic.
-    *   *Strategy:* Focus on common elements first (Master/Variant). Advanced parsing features added later.
+    *   *Strategy:* Focus on common elements first (Main/Variant). Advanced parsing features added later.
 
 4.  **Composition (Base)** (`@mtngtools/hls-base`) - [Spec](../packages/hls-base/spec/README.md)
     *   Compose Core, Transfer, and Parser into a default client.

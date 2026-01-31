@@ -10,7 +10,7 @@ export type {
   SessionKey,
   MediaGroup,
   Variant,
-  MasterManifest,
+  MainManifest,
   EncryptionKey,
   ByteRange,
   MediaInitialization,

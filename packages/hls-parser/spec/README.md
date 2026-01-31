@@ -4,14 +4,14 @@
 
 ## Overview
 
-A lightweight, zero-dependency parser for HLS M3U8 manifests. It is designed to be compatible with parsing both Master and Variant playlists.
+A lightweight, zero-dependency parser for HLS M3U8 manifests. It is designed to be compatible with parsing both Main and Variant playlists.
 
 ## Requirements
 
 1.  **Zero Dependencies**: Validly parse M3U8 without external libraries like `m3u8-parser`.
 2.  **Web Standards Compatible**: Usable in Node.js, Cloudflare Workers, and Browsers.
 3.  **Parsing Capabilities**:
-    *   **Master Playlist (`MasterManifest`)**:
+    *   **Main Playlist (`MainManifest`)**:
         *   Extract `version` and `independentSegments`.
         *   Parse specific start time offset (`start: { timeOffset, precise }`).
         *   Extract `variants` list (see below).
@@ -44,7 +44,7 @@ A lightweight, zero-dependency parser for HLS M3U8 manifests. It is designed to 
 
 The parser currently handles the following HLS tags:
 
-**Master Playlist Tags:**
+**Main Playlist Tags:**
 - `EXTM3U` (header)
 - `EXT-X-VERSION`
 - `EXT-X-INDEPENDENT-SEGMENTS`

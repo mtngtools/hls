@@ -1,7 +1,7 @@
 {
   "name": "@mtngtools/hls-parser",
   "version": "0.1.0",
-  "description": "HLS manifest parser for master and variant manifests",
+  "description": "HLS manifest parser for main and variant manifests",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -39,4 +39,3 @@
     "access": "public"
   }
 }
-

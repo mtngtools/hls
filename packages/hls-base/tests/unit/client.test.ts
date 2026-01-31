@@ -66,7 +66,7 @@ describe('HlsClient', () => {
 
   it('should accept plugins', () => {
     const plugins = {
-      fetchMasterManifest: vi.fn(),
+      fetchMainManifest: vi.fn(),
     };
 
     const client = new HlsClient({ plugins });
