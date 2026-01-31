@@ -25,7 +25,7 @@ Consult [`README.md`](./README.md) and [`package.json`](./package.json) as best 
 - **Minimal dependencies** - prefer custom implementation over heavy libraries
 - Use custom M3U8 parser (not m3u8-parser) for zero/minimal dependencies
 - Runtime-agnostic implementation
-- Focus on core needs: master manifest, variant manifests, chunk discovery
+- Focus on core needs: main manifest, variant manifests, chunk discovery
 
 ----
 

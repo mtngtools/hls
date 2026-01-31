@@ -8,11 +8,15 @@ This package serves as the single source of truth for TypeScript interfaces and 
 
 ## Manifest Types
 
-### MasterManifest and VariantManifest
+### MainManifest and VariantManifest
 
-Both `MasterManifest` and `VariantManifest` include:
+Both `MainManifest` and `VariantManifest` include:
 
 - **sourceContent**: `string` — Raw M3U8 string as received from source (populated by parser). Enables the pipeline to store a copy of the source manifest when publishing to destination.
+
+### Pipeline Interfaces
+
+Interfaces for pipeline steps (like `generateChunkPath`) are designed to provide full context, often including the parent manifest (`VariantManifest`) to allow for index-based logic or other advanced generation strategies.
 
 ## Requirements
 

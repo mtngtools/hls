@@ -98,6 +98,11 @@ export class OfetchFetcher implements Fetcher {
             new Uint8Array(buffer).set(encoded);
             return buffer;
           }
+          // Handle Blob directly
+          if (responseData && typeof responseData === 'object' && 'constructor' in responseData && (responseData as { constructor?: { name?: string } }).constructor?.name === 'Blob') {
+            const blob = responseData as Blob;
+            return await blob.arrayBuffer();
+          }
           return new ArrayBuffer(0);
         },
         headers: responseHeaders,

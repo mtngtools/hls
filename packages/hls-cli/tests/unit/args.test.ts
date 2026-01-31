@@ -25,8 +25,8 @@ describe('parseArgs', () => {
   });
 
   it('should parse source and destination positional arguments', () => {
-    const args = parseArgs(['https://example.com/master.m3u8', '/output']);
-    expect(args.source).toBe('https://example.com/master.m3u8');
+    const args = parseArgs(['https://example.com/main.m3u8', '/output']);
+    expect(args.source).toBe('https://example.com/main.m3u8');
     expect(args.destination).toBe('/output');
     expect(mockExit).not.toHaveBeenCalled();
   });

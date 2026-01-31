@@ -1,6 +1,6 @@
 # @mtngtools/hls-parser
 
-HLS manifest parser for master and variant manifests.
+HLS manifest parser for main and variant manifests.
 
 ## Overview
 
@@ -15,13 +15,13 @@ pnpm add @mtngtools/hls-parser
 ## Usage
 
 ```typescript
-import { parseMasterManifest, parseVariantManifest } from '@mtngtools/hls-parser';
+import { parseMainManifest, parseVariantManifest } from '@mtngtools/hls-parser';
 ```
 
 ## Features
 
 - Custom M3U8 parser (zero/minimal dependencies)
-- Master manifest parsing
+- Main manifest parsing
 - Variant manifest parsing
 - Chunk discovery
 - Runtime-agnostic

@@ -15,7 +15,7 @@ pnpm add @mtngtools/hls-types
 ## Usage
 
 ```typescript
-import type { MasterManifest, Variant, Chunk } from '@mtngtools/hls-types';
+import type { MainManifest, Variant, Chunk } from '@mtngtools/hls-types';
 ```
 
 ## Features

@@ -1,9 +1,9 @@
 /**
- * Master manifest parser
+ * Main manifest parser
  */
 
 import type {
-  MasterManifest,
+  MainManifest,
   Variant,
   SessionData,
   SessionKey,
@@ -13,18 +13,18 @@ import { tokenize, extractTagName, extractTagValue } from './tokenizer.js';
 import { parseAttributes, parseResolution } from '@mtngtools/hls-utils';
 
 /**
- * Parse a master manifest from M3U8 content
+ * Parse a main manifest from M3U8 content
  *
  * @param content - M3U8 manifest content
  * @param context - Transfer context
- * @returns Parsed master manifest
+ * @returns Parsed main manifest
  */
-export function parseMasterManifest(
+export function parseMainManifest(
   content: string,
   _context: TransferContext,
-): MasterManifest {
+): MainManifest {
   const tokens = tokenize(content);
-  const manifest: MasterManifest = {
+  const manifest: MainManifest = {
     variants: [],
     sourceContent: content,
   };

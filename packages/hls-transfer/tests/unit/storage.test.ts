@@ -40,7 +40,7 @@ vi.mock('node:fs', async () => {
 });
 
 vi.mock('node:stream', async () => {
-  const actual = await vi.importActual('node:stream');
+  const actual = await vi.importActual<typeof import('node:stream')>('node:stream');
   return {
     ...actual,
     Readable: {
@@ -62,7 +62,7 @@ describe('FsStorage', () => {
     config: {
       source: {
         mode: 'fetch',
-        config: { url: 'https://example.com/master.m3u8' },
+        config: { url: 'https://example.com/main.m3u8' },
       },
       destination: {
         mode: 'file',
@@ -115,7 +115,7 @@ describe('FsStorage', () => {
     vi.mocked(pipeline).mockResolvedValue(undefined);
     vi.mocked(Readable.fromWeb).mockReturnValue(mockNodeStream);
 
-    await storage.store(mockWebStream, '/path/to/file.txt', mockContext);
+    await storage.store(mockWebStream as unknown as Readable, '/path/to/file.txt', mockContext);
 
     expect(Readable.fromWeb).toHaveBeenCalledWith(mockWebStream);
     expect(pipeline).toHaveBeenCalledWith(mockNodeStream, mockWriteStream);

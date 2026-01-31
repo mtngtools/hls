@@ -61,13 +61,13 @@ export class MockStorage implements Storage {
  * Create MSW handlers for HLS manifests and chunks
  */
 export function createHandlers(options: {
-  masterManifest?: string;
+  mainManifest?: string;
   variantManifests?: Record<string, string>;
   chunks?: Record<string, string | Uint8Array>;
   baseUrl?: string;
 }): RequestHandler[] {
   const {
-    masterManifest = '',
+    mainManifest = '',
     variantManifests = {},
     chunks = {},
     baseUrl = 'https://example.com',
@@ -75,11 +75,11 @@ export function createHandlers(options: {
 
   const handlers: RequestHandler[] = [];
 
-  // Master manifest handler
-  if (masterManifest) {
+  // Main manifest handler
+  if (mainManifest) {
     handlers.push(
-      http.get(`${baseUrl}/master.m3u8`, () => {
-        return HttpResponse.text(masterManifest, {
+      http.get(`${baseUrl}/main.m3u8`, () => {
+        return HttpResponse.text(mainManifest, {
           headers: { 'Content-Type': 'application/vnd.apple.mpegurl' },
         });
       }),

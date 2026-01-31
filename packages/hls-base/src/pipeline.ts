@@ -11,7 +11,7 @@ import type {
   TransferPlugins,
   TransferContext,
   FetchResponse,
-  MasterManifest,
+  MainManifest,
   Variant,
   VariantManifest,
   Chunk,
@@ -25,19 +25,19 @@ export class DefaultPipelineExecutor implements PipelineExecutor {
   constructor(
     public readonly defaults: DefaultImplementations,
     private plugins?: TransferPlugins,
-  ) {}
+  ) { }
 
-  async fetchMasterManifest(url: string, context: TransferContext): Promise<FetchResponse> {
+  async fetchMainManifest(url: string, context: TransferContext): Promise<FetchResponse> {
     return (
-      this.plugins?.fetchMasterManifest?.(url, context) ??
+      this.plugins?.fetchMainManifest?.(url, context) ??
       this.defaults.fetcher.fetch(url, context)
     );
   }
 
-  async parseMasterManifest(content: string, context: TransferContext): Promise<MasterManifest> {
+  async parseMainManifest(content: string, context: TransferContext): Promise<MainManifest> {
     return (
-      this.plugins?.parseMasterManifest?.(content, context) ??
-      this.defaults.parser.parseMasterManifest(content, context)
+      this.plugins?.parseMainManifest?.(content, context) ??
+      this.defaults.parser.parseMainManifest(content, context)
     );
   }
 
@@ -46,11 +46,11 @@ export class DefaultPipelineExecutor implements PipelineExecutor {
       return this.plugins.filterVariants(context);
     }
 
-    // Default: return all variants from master manifest
-    if (!context.masterManifest) {
+    // Default: return all variants from main manifest
+    if (!context.mainManifest) {
       return [];
     }
-    return context.masterManifest.variants;
+    return context.mainManifest.variants;
   }
 
   async fetchVariantManifest(
@@ -61,16 +61,21 @@ export class DefaultPipelineExecutor implements PipelineExecutor {
       return this.plugins.fetchVariantManifest(variant, context);
     }
 
-    // Resolve variant URI relative to master manifest URL
-    const masterUrl = this.getMasterManifestUrl(context);
-    const variantUrl = resolveUrl(masterUrl, variant.uri);
+    // Check if variant URI is absolute
+    if (variant.uri.match(/^https?:\/\//)) {
+      return this.defaults.fetcher.fetch(variant.uri, context);
+    }
+
+    // Resolve variant URI relative to main manifest URL
+    const mainUrl = this.getMainManifestUrl(context);
+    const variantUrl = resolveUrl(mainUrl, variant.uri);
     return this.defaults.fetcher.fetch(variantUrl, context);
   }
 
   /**
-   * Get master manifest URL from context
+   * Get main manifest URL from context
    */
-  private getMasterManifestUrl(context: TransferContext): string {
+  private getMainManifestUrl(context: TransferContext): string {
     const sourceConfig = context.config.source;
     if (sourceConfig.mode === 'fetch' && 'url' in sourceConfig.config) {
       return sourceConfig.config.url;
@@ -116,31 +121,31 @@ export class DefaultPipelineExecutor implements PipelineExecutor {
     return chunks;
   }
 
-  async createDestinationMasterManifest(context: TransferContext): Promise<string> {
-    if (this.plugins?.createDestinationMasterManifest) {
-      return this.plugins.createDestinationMasterManifest(context);
+  async createDestinationMainManifest(context: TransferContext): Promise<string> {
+    if (this.plugins?.createDestinationMainManifest) {
+      return this.plugins.createDestinationMainManifest(context);
     }
 
-    // Default: serialize master manifest to M3U8 format
-    if (!context.masterManifest) {
-      throw new Error('Master manifest not available in context');
+    // Default: serialize main manifest to M3U8 format
+    if (!context.mainManifest) {
+      throw new Error('Main manifest not available in context');
     }
 
-    return this.serializeMasterManifest(context.masterManifest);
+    return this.serializeMainManifest(this.rewriteMainManifest(context.mainManifest));
   }
 
-  async generateMasterManifestPath(
+  async generateMainManifestPath(
     sourcePath: string,
-    manifest: MasterManifest,
+    manifest: MainManifest,
     context: TransferContext,
   ): Promise<string> {
-    if (this.plugins?.generateMasterManifestPath) {
-      return this.plugins.generateMasterManifestPath(sourcePath, manifest, context);
+    if (this.plugins?.generateMainManifestPath) {
+      return this.plugins.generateMainManifestPath(sourcePath, manifest, context);
     }
 
-    // Default: preserve source path structure
-    // Extract filename from source path or use default
-    const fileName = sourcePath.split('/').pop() || 'master.m3u8';
+    // Default: use standardized 'main.m3u8' as the main manifest name
+    // The user explicitly requested to avoid using the original source filename
+    const fileName = 'main.m3u8';
     const destConfig = context.config.destination.config;
     if ('path' in destConfig) {
       // FileConfig
@@ -151,7 +156,7 @@ export class DefaultPipelineExecutor implements PipelineExecutor {
   }
 
   async storeManifest(
-    manifest: MasterManifest | VariantManifest,
+    manifest: MainManifest | VariantManifest,
     path: string,
     context: TransferContext,
   ): Promise<void> {
@@ -162,8 +167,8 @@ export class DefaultPipelineExecutor implements PipelineExecutor {
     // Default: serialize manifest to string and store as stream
     const content =
       'variants' in manifest
-        ? this.serializeMasterManifest(manifest)
-        : this.serializeVariantManifest(manifest);
+        ? this.serializeMainManifest(this.rewriteMainManifest(manifest as MainManifest))
+        : this.serializeVariantManifest(this.rewriteVariantManifest(manifest as VariantManifest));
 
     // Convert string to stream
     // Create a readable stream from the content string
@@ -206,7 +211,11 @@ export class DefaultPipelineExecutor implements PipelineExecutor {
       endList: true, // Assume VOD
     };
 
-    return this.serializeVariantManifest(variantManifest);
+    // Rewrite chunk URIs to be simple filenames
+    // Since chunks are in the same folder as variant manifest, we just need the filename
+    const rewrittenManifest = this.rewriteVariantManifest(variantManifest);
+
+    return this.serializeVariantManifest(rewrittenManifest);
   }
 
   async generateVariantManifestPath(
@@ -218,8 +227,20 @@ export class DefaultPipelineExecutor implements PipelineExecutor {
       return this.plugins.generateVariantManifestPath(sourcePath, variant, context);
     }
 
-    // Default: preserve source path structure
-    const fileName = sourcePath.split('/').pop() || 'variant.m3u8';
+    // Default: use subfolder structure for absolute URLs or if requested
+    // If variant.uri is absolute, we MUST use a subfolder to avoid collisions
+    const isAbsolute = variant.uri.match(/^https?:\/\//);
+
+    if (isAbsolute) {
+      const subfolder = this.getVariantPath(variant);
+      const destConfig = context.config.destination.config;
+      if ('path' in destConfig) {
+        return `${destConfig.path}/${subfolder}index.m3u8`;
+      }
+      return `${subfolder}index.m3u8`;
+    }
+
+    const fileName = this.getFileName(sourcePath) || 'variant.m3u8';
     const destConfig = context.config.destination.config;
     if ('path' in destConfig) {
       // FileConfig
@@ -231,6 +252,14 @@ export class DefaultPipelineExecutor implements PipelineExecutor {
   async downloadChunk(chunk: Chunk, context: TransferContext): Promise<TransferStream> {
     if (this.plugins?.downloadChunk) {
       return this.plugins.downloadChunk(chunk, context);
+    }
+
+    // Check for absolute URI
+    if (chunk.uri.match(/^https?:\/\//)) {
+      const response = await this.defaults.fetcher.fetch(chunk.uri, context);
+      const arrayBuffer = await response.arrayBuffer();
+      const { Readable } = await import('node:stream');
+      return Readable.from([new Uint8Array(arrayBuffer)]) as TransferStream;
     }
 
     // Resolve chunk URI relative to variant manifest URL
@@ -247,40 +276,124 @@ export class DefaultPipelineExecutor implements PipelineExecutor {
 
   /**
    * Get variant URL from context
-   * Tries to reconstruct it from master manifest and variant URI
+   * Tries to reconstruct it from main manifest and variant URI
    */
   private getVariantUrlFromContext(context: TransferContext): string | undefined {
-    if (!context.masterManifest || !context.filteredVariants || context.filteredVariants.length === 0) {
+    if (!context.mainManifest || !context.filteredVariants || context.filteredVariants.length === 0) {
       return undefined;
     }
     // Use the first filtered variant (in practice, we'd need the specific variant)
     // This is a fallback - ideally the variant URL should be stored in metadata
-    const masterUrl = this.getMasterManifestUrl(context);
+    const mainUrl = this.getMainManifestUrl(context);
     const variant = context.filteredVariants[0];
     if (variant) {
-      return resolveUrl(masterUrl, variant.uri);
+      return resolveUrl(mainUrl, variant.uri);
     }
     return undefined;
+  }
+
+  /**
+   * Get variant path for subfolder structure (e.g., "1200000/")
+   */
+  private getVariantPath(variant: Variant): string {
+    return `${variant.bandwidth}/`;
+  }
+
+  /**
+   * Rewrite main manifest URIs for storage
+   */
+  private rewriteMainManifest(manifest: MainManifest): MainManifest {
+    // Clone manifest to avoid mutating original
+    const newManifest = { ...manifest };
+
+    // Rewrite variant URIs to match destination structure
+    newManifest.variants = newManifest.variants.map(variant => {
+      // Use getVariantPath logic to determine destination URI relative to main manifest
+      // If original was absolute, we forced a subfolder
+      const isAbsolute = variant.uri.match(/^https?:\/\//);
+      if (isAbsolute) {
+        return {
+          ...variant,
+          uri: `${this.getVariantPath(variant)}index.m3u8`,
+        };
+      }
+      return variant;
+    });
+
+    return newManifest;
+  }
+
+  /**
+   * Rewrite variant manifest URIs for storage
+   */
+  private rewriteVariantManifest(manifest: VariantManifest): VariantManifest {
+    // Clone manifest to avoid mutating original
+    const newManifest = { ...manifest };
+
+    // Rewrite chunk URIs to be simple filenames
+    newManifest.chunks = newManifest.chunks.map(chunk => ({
+      ...chunk,
+      uri: this.getChunkFileName(chunk, manifest),
+    }));
+
+    return newManifest;
+  }
+
+  /**
+   * Extracts the filename from a given path.
+   * @param path The full path or URL.
+   * @returns The filename, or an empty string if not found.
+   */
+  private getFileName(path: string): string {
+    return path.split('/').pop() || '';
   }
 
   async generateChunkPath(
     sourcePath: string,
     variant: Variant,
+    manifest: VariantManifest,
     chunk: Chunk,
     context: TransferContext,
   ): Promise<string> {
     if (this.plugins?.generateChunkPath) {
-      return this.plugins.generateChunkPath(sourcePath, variant, chunk, context);
+      return this.plugins.generateChunkPath(sourcePath, variant, manifest, chunk, context);
     }
 
-    // Default: preserve source path structure
-    const fileName = sourcePath.split('/').pop() || 'chunk.ts';
+    // Default: Generate clean filename
+    const fileName = this.getChunkFileName(chunk, manifest);
+
+    // 3. Determine parent folder based on variant
+    // If variant.uri is absolute, we used a subfolder for it, so chunks go there too
+    const isVariantAbsolute = variant.uri.match(/^https?:\/\//);
+    const subfolder = isVariantAbsolute ? this.getVariantPath(variant) : '';
+
     const destConfig = context.config.destination.config;
     if ('path' in destConfig) {
       // FileConfig
-      return `${destConfig.path}/${fileName}`;
+      return `${destConfig.path}/${subfolder}${fileName}`;
     }
-    return sourcePath;
+    return `${subfolder}${fileName}`;
+  }
+
+  /**
+   * Generate simpler chunk filename
+   */
+  private getChunkFileName(chunk: Chunk, manifest: VariantManifest): string {
+    // 1. Strip query params
+    const cleanUri = chunk.uri.split(/[?#]/)[0] ?? '';
+
+    // 2. Check for number pattern in filename
+    const basename = cleanUri.split('/').pop() || '';
+    const numberMatch = basename.match(/(\d+)\.ts$/);
+
+    if (numberMatch) {
+      // Use the number found in the original filename
+      return numberMatch[0];
+    }
+
+    // Fallback: use index in manifest chunks list
+    const index = manifest.chunks.indexOf(chunk);
+    return `${index}.ts`;
   }
 
   async storeChunk(
@@ -305,9 +418,9 @@ export class DefaultPipelineExecutor implements PipelineExecutor {
   }
 
   /**
-   * Serialize master manifest to M3U8 format
+   * Serialize main manifest to M3U8 format
    */
-  private serializeMasterManifest(manifest: MasterManifest): string {
+  private serializeMainManifest(manifest: MainManifest): string {
     const lines: string[] = ['#EXTM3U'];
 
     if (manifest.version !== undefined) {

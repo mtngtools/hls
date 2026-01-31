@@ -9,4 +9,4 @@ export { HlsParser } from './parser.js';
 
 // Re-export implementations for convenience
 export { OfetchFetcher, FsStorage } from '@mtngtools/hls-transfer';
-export { parseMasterManifest, parseVariantManifest } from '@mtngtools/hls-parser';
+export { parseMainManifest, parseVariantManifest } from '@mtngtools/hls-parser';
