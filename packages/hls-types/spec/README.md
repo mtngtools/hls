@@ -14,6 +14,10 @@ Both `MasterManifest` and `VariantManifest` include:
 
 - **sourceContent**: `string` — Raw M3U8 string as received from source (populated by parser). Enables the pipeline to store a copy of the source manifest when publishing to destination.
 
+### Pipeline Interfaces
+
+Interfaces for pipeline steps (like `generateChunkPath`) are designed to provide full context, often including the parent manifest (`VariantManifest`) to allow for index-based logic or other advanced generation strategies.
+
 ## Requirements
 
 * Each package will have specifications for interfaces and types that need to be defined. 

@@ -240,7 +240,7 @@ export class TransferJobExecutor {
     _manifest: VariantManifest,
   ): Promise<void> {
     const chunkPromises = chunks.map((chunk) =>
-      this.processChunk(chunk, variant),
+      this.processChunk(chunk, variant, _manifest),
     );
 
     await Promise.all(chunkPromises);
@@ -249,7 +249,11 @@ export class TransferJobExecutor {
   /**
    * Process a single chunk with retry logic
    */
-  private async processChunk(chunk: Chunk, variant: Variant): Promise<void> {
+  private async processChunk(
+    chunk: Chunk,
+    variant: Variant,
+    manifest: VariantManifest,
+  ): Promise<void> {
     const retryConfig = this.context.config.source.retry ?? {
       maxRetries: 3,
       retryDelay: 1000,
@@ -268,6 +272,7 @@ export class TransferJobExecutor {
         const chunkPath = await this.executor.generateChunkPath(
           chunk.uri,
           variant,
+          manifest,
           chunk,
           this.context,
         );

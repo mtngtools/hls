@@ -244,6 +244,7 @@ export interface TransferPlugins {
   generateChunkPath?: (
     sourcePath: string,
     variant: Variant,
+    manifest: VariantManifest,
     chunk: Chunk,
     context: TransferContext,
   ) => Promise<string>;
@@ -351,6 +352,7 @@ export interface PipelineExecutor {
   generateChunkPath(
     sourcePath: string,
     variant: Variant,
+    manifest: VariantManifest,
     chunk: Chunk,
     context: TransferContext,
   ): Promise<string>;

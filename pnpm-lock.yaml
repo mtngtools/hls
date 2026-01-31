@@ -80,15 +80,6 @@ importers:
         specifier: workspace:*
         version: link:../hls-types
     devDependencies:
-      '@mtngtools/hls-base':
-        specifier: workspace:*
-        version: link:../hls-base
-      '@mtngtools/hls-parser':
-        specifier: workspace:*
-        version: link:../hls-parser
-      '@mtngtools/hls-transfer':
-        specifier: workspace:*
-        version: link:../hls-transfer
       '@types/node':
         specifier: ^25.1.0
         version: 25.1.0
