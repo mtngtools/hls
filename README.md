@@ -15,10 +15,12 @@ This monorepo contains TypeScript utilities for working with HLS content, includ
 
 ## Packages
 
-- `@mtngtools/hls-types` - Core types and interfaces
-- `@mtngtools/hls-parser` - HLS manifest parser
-- `@mtngtools/hls-core` - Transfer pipeline with plugin system
-- `@mtngtools/hls-cli` - CLI tools
+- `@mtngtools/utils-hls-types` - Core types and interfaces
+- `@mtngtools/utils-hls-parser` - HLS manifest parser
+- `@mtngtools/utils-hls-core` - Transfer pipeline with plugin system
+- `@mtngtools/frame-hls-transfer` - HLS transfer (fetch, storage)
+- `@mtngtools/frame-hls-base` - Default HLS client (Core + Transfer + Parser)
+- `@mtngtools/frame-hls-cli` - Basic CLI (no custom transfer options; not actively developed)
 
 ## Getting Started
 

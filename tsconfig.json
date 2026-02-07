@@ -25,22 +25,22 @@
   "files": [],
   "references": [
     {
-      "path": "./packages/hls-base"
+      "path": "./packages/frame-hls-base"
     },
     {
-      "path": "./packages/hls-cli"
+      "path": "./packages/frame-hls-cli"
     },
     {
-      "path": "./packages/hls-core"
+      "path": "./packages/utils-hls-core"
     },
     {
-      "path": "./packages/hls-parser"
+      "path": "./packages/utils-hls-parser"
     },
     {
-      "path": "./packages/hls-transfer"
+      "path": "./packages/frame-hls-transfer"
     },
     {
-      "path": "./packages/hls-types"
+      "path": "./packages/utils-hls-types"
     }
   ],
   "exclude": [
