@@ -4,7 +4,7 @@
  */
 
 import { Readable } from 'node:stream';
-import { resolveUrl } from '@mtngtools/hls-utils';
+import { resolveUrl } from './url.js';
 import type {
   PipelineExecutor,
   DefaultImplementations,

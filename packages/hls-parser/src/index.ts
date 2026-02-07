@@ -20,9 +20,7 @@ export function parseMainManifest(
   context: TransferContext,
 ): Promise<MainManifest> {
   return Promise.resolve(parseMainManifestImpl(content, context));
-}
-
-/**
+}/**
  * Parse a variant manifest from M3U8 content
  *
  * @param content - M3U8 manifest content

@@ -41,9 +41,6 @@
     },
     {
       "path": "./packages/hls-types"
-    },
-    {
-      "path": "./packages/hls-utils"
     }
   ],
   "exclude": [

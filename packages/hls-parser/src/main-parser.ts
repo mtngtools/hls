@@ -10,7 +10,7 @@ import type {
 } from '@mtngtools/hls-types';
 import type { TransferContext } from '@mtngtools/hls-types';
 import { tokenize, extractTagName, extractTagValue } from './tokenizer.js';
-import { parseAttributes, parseResolution } from '@mtngtools/hls-utils';
+import { parseAttributes, parseResolution } from './attributes.js';
 
 /**
  * Parse a main manifest from M3U8 content

@@ -47,10 +47,6 @@ The following packages are listed in their build priority order, which aligns wi
 6.  **Types** (`@mtngtools/hls-types`) - [Spec](../packages/hls-types/spec/README.md)
     *   *Note:* Shared type definitions (foundation for all other packages).
 
-7.  **Utilities** (`@mtngtools/hls-utils`) - [Spec](../packages/hls-utils/spec/README.md)
-    *   Extracted ONLY as needed.
-    *   *Strategy:* Packages maintain their own utils initially. Shared utils are created only when multiple packages require the same functionality.
-
 ## Architecture Overview
 
 ```
@@ -61,17 +57,17 @@ The following packages are listed in their build priority order, which aligns wi
         │              │              │              │
         │              │              │              │
         ▼              ▼              ▼              ▼
-┌──────────────┐ ┌──────────────┐ ┌──────────────┐ ┌──────────────┐
-│ hls-utils    │ │ hls-parser   │ │ hls-transfer │ │  hls-core    │
-│ (Utilities)  │ │ (Parser)     │ │ (Fetch/Store)│ │(Orchestration)│
-│              │ │              │ │              │ │              │
-│ Implements:  │ │ Implements:  │ │ Implements:  │ │ Uses only:   │
-│ (none)       │ │ Parser       │ │ Fetcher       │ │ Interfaces   │
-│              │ │              │ │ Storage       │ │              │
-└──────────────┘ └──────────────┘ └──────────────┘ └──────────────┘
-        │              │              │              │
-        │              │              │              │
-        └──────────────┴──────────────┴──────────────┘
+┌──────────────┐ ┌──────────────┐ ┌──────────────┐
+│ hls-parser   │ │ hls-transfer │ │  hls-core    │
+│ (Parser)     │ │ (Fetch/Store)│ │(Orchestration)│
+│              │ │              │ │              │
+│ Implements:  │ │ Implements:  │ │ Uses only:   │
+│ Parser       │ │ Fetcher       │ │ Interfaces   │
+│              │ │ Storage       │ │              │
+└──────────────┘ └──────────────┘ └──────────────┘
+        │              │              │
+        │              │              │
+        └──────────────┴──────────────┘
                                       │
                                       ▼
                             ┌──────────────┐
@@ -94,12 +90,11 @@ The following packages are listed in their build priority order, which aligns wi
 
 **Dependency Flow**:
 1. `hls-types` → No dependencies (foundation - defines all interfaces)
-2. `hls-utils` → Depends on `hls-types`
-3. `hls-parser` → Depends on `hls-types`, `hls-utils` (implements `Parser` interface)
-4. `hls-transfer` → Depends on `hls-types` (implements `Fetcher` and `Storage` interfaces)
-5. `hls-core` → Depends only on `hls-types` (uses interfaces, no concrete implementations)
-6. `hls-base` → Depends on `hls-core`, `hls-transfer`, `hls-parser` (composes all implementations)
-7. `hls-cli` → Depends on `hls-base`
+2. `hls-parser` → Depends on `hls-types` (implements `Parser` interface)
+3. `hls-transfer` → Depends on `hls-types` (implements `Fetcher` and `Storage` interfaces)
+4. `hls-core` → Depends only on `hls-types` (uses interfaces, no concrete implementations)
+5. `hls-base` → Depends on `hls-core`, `hls-transfer`, `hls-parser` (composes all implementations)
+6. `hls-cli` → Depends on `hls-base`
 
 The project follows a monorepo structure to organize core logic and interface layers.
 
