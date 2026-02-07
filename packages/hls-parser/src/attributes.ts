@@ -148,4 +148,3 @@ export function parseByteRange(byteRange: string): { length: number; offset?: nu
   }
   return { length };
 }
-

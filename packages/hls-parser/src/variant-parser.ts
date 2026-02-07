@@ -11,7 +11,7 @@ import type {
 } from '@mtngtools/hls-types';
 import type { TransferContext } from '@mtngtools/hls-types';
 import { tokenize, extractTagName, extractTagValue } from './tokenizer.js';
-import { parseAttributes, parseByteRange } from '@mtngtools/hls-utils';
+import { parseAttributes, parseByteRange } from './attributes.js';
 
 /**
  * Parse a variant manifest from M3U8 content

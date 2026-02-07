@@ -16,8 +16,7 @@ export default defineConfig({
                 '@mtngtools/hls-core',
                 '@mtngtools/hls-transfer',
                 '@mtngtools/hls-types',
-                '@mtngtools/hls-parser',
-                '@mtngtools/hls-utils'
+                '@mtngtools/hls-parser'
             ],
         },
     },
