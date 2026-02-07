@@ -33,71 +33,49 @@ importers:
         specifier: ^2.0.0
         version: 2.1.9(@types/node@25.1.0)(msw@2.12.7(@types/node@25.1.0)(typescript@5.9.3))
 
-  packages/hls-base:
+  packages/frame-hls-base:
     dependencies:
-      '@mtngtools/hls-core':
+      '@mtngtools/frame-hls-transfer':
         specifier: workspace:*
-        version: link:../hls-core
-      '@mtngtools/hls-parser':
+        version: link:../frame-hls-transfer
+      '@mtngtools/utils-hls-core':
         specifier: workspace:*
-        version: link:../hls-parser
-      '@mtngtools/hls-transfer':
+        version: link:../utils-hls-core
+      '@mtngtools/utils-hls-parser':
         specifier: workspace:*
-        version: link:../hls-transfer
-      '@mtngtools/hls-types':
+        version: link:../utils-hls-parser
+      '@mtngtools/utils-hls-types':
         specifier: workspace:*
-        version: link:../hls-types
-      '@mtngtools/hls-utils':
-        specifier: workspace:*
-        version: link:../hls-utils
+        version: link:../utils-hls-types
     devDependencies:
       '@types/node':
         specifier: ^25.1.0
         version: 25.1.0
 
-  packages/hls-cli:
+  packages/frame-hls-cli:
     dependencies:
-      '@mtngtools/hls-base':
+      '@mtngtools/frame-hls-base':
         specifier: workspace:*
-        version: link:../hls-base
-      '@mtngtools/hls-core':
+        version: link:../frame-hls-base
+      '@mtngtools/utils-hls-core':
         specifier: workspace:*
-        version: link:../hls-core
-      '@mtngtools/hls-parser':
+        version: link:../utils-hls-core
+      '@mtngtools/utils-hls-parser':
         specifier: workspace:*
-        version: link:../hls-parser
-      '@mtngtools/hls-types':
+        version: link:../utils-hls-parser
+      '@mtngtools/utils-hls-types':
         specifier: workspace:*
-        version: link:../hls-types
+        version: link:../utils-hls-types
     devDependencies:
       '@types/node':
         specifier: ^25.1.0
         version: 25.1.0
 
-  packages/hls-core:
+  packages/frame-hls-transfer:
     dependencies:
-      '@mtngtools/hls-types':
+      '@mtngtools/utils-hls-types':
         specifier: workspace:*
-        version: link:../hls-types
-    devDependencies:
-      '@types/node':
-        specifier: ^25.1.0
-        version: 25.1.0
-
-  packages/hls-parser:
-    dependencies:
-      '@mtngtools/hls-types':
-        specifier: workspace:*
-        version: link:../hls-types
-      '@mtngtools/hls-utils':
-        specifier: workspace:*
-        version: link:../hls-utils
-
-  packages/hls-transfer:
-    dependencies:
-      '@mtngtools/hls-types':
-        specifier: workspace:*
-        version: link:../hls-types
+        version: link:../utils-hls-types
       ofetch:
         specifier: ^1.3.3
         version: 1.5.1
@@ -106,13 +84,23 @@ importers:
         specifier: ^25.1.0
         version: 25.1.0
 
-  packages/hls-types: {}
-
-  packages/hls-utils:
+  packages/utils-hls-core:
     dependencies:
-      '@mtngtools/hls-types':
+      '@mtngtools/utils-hls-types':
         specifier: workspace:*
-        version: link:../hls-types
+        version: link:../utils-hls-types
+    devDependencies:
+      '@types/node':
+        specifier: ^25.1.0
+        version: 25.1.0
+
+  packages/utils-hls-parser:
+    dependencies:
+      '@mtngtools/utils-hls-types':
+        specifier: workspace:*
+        version: link:../utils-hls-types
+
+  packages/utils-hls-types: {}
 
 packages:
 
