@@ -48,6 +48,9 @@ importers:
         specifier: workspace:*
         version: link:../utils-hls-types
     devDependencies:
+      '@mtngtools/utils-hls-core':
+        specifier: workspace:*
+        version: link:../utils-hls-core
       '@types/node':
         specifier: ^22.0.0
         version: 22.19.11

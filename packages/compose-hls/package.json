@@ -21,7 +21,14 @@
         "typecheck": "tsc --noEmit",
         "lint": "oxlint",
         "test": "vitest run",
-        "test:watch": "vitest"
+        "test:watch": "vitest",
+        "test:verbose": "vitest run --reporter=verbose",
+        "test:ui": "vitest --ui",
+        "test:min": "vitest run --reporter=dot",
+        "test:e2e": "vitest run --config vitest.e2e.config.ts",
+        "test:e2e:ui": "vitest --ui --config vitest.e2e.config.ts",
+        "test:all": "pnpm run test && pnpm run test:e2e",
+        "test:coverage": "vitest run --coverage"
     },
     "dependencies": {
         "@mtngtools/frame-hls-base": "workspace:*",
@@ -29,6 +36,7 @@
         "@mtngtools/utils-hls-types": "workspace:*"
     },
     "devDependencies": {
+        "@mtngtools/utils-hls-core": "workspace:*",
         "@types/node": "^22.0.0"
     },
     "keywords": [

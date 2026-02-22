@@ -1,0 +1,31 @@
+import { defineConfig } from 'vitest/config';
+import { loadEnv } from 'vite';
+
+// Load environment variables for e2e test mode
+// Load both .env.test.e2e and .env.test.e2e.local
+const env = {
+    ...loadEnv('test.e2e', process.cwd(), ''),
+    ...loadEnv('test', process.cwd(), '')
+};
+
+// Vitest config for E2E tests
+export default defineConfig({
+    test: {
+        include: ['tests/e2e/**/*.test.ts'],
+        globals: true,
+        environment: 'node',
+        // Pass environment variables to the test process.
+        // Merge shell env so variables like AWS_ACCESS_KEY_ID are preserved
+        // even when not present in .env files.
+        env: {
+            ...process.env,
+            ...env,
+            NODE_ENV: 'test',
+            VITEST_MODE: 'e2e'
+        },
+        coverage: {
+            provider: 'v8',
+            reporter: ['text', 'json', 'html'],
+        }
+    }
+});
