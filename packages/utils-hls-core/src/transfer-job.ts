@@ -12,6 +12,8 @@ import type {
   Variant,
   VariantManifest,
   Chunk,
+  TransferProgressSummary,
+  VariantTransferProgress,
 } from '@mtngtools/utils-hls-types';
 import { Semaphore } from './concurrency.js';
 
@@ -44,6 +46,10 @@ export class TransferJobExecutor {
       totalBytes: 0,
       transferredBytes: 0,
     };
+
+    // Note: The TransferJobOptions must be updated in utils-hls-types/src/core.ts 
+    // to officially support `progressTracker?: ProgressTracker`. It's done below via a cast for now.
+    // The preferred way would be adding it to `TransferJobOptions`, which we will do shortly.
 
     // Initialize semaphores for concurrency control
     const sourceMaxConcurrent =
@@ -84,6 +90,14 @@ export class TransferJobExecutor {
       // Initialize progress tracking for variants
       this.initializeProgress(filteredVariants);
 
+      // Trigger OnStart on progress tracker
+      const startTracker = this.job.options?.progressTracker;
+      if (startTracker) {
+        // Total chunks requires downloading variant manifests first, or estimating
+        // We will call onStart with 0 for now and update total chunks along the way.
+        await startTracker.onStart(0);
+      }
+
       // Step 8: Create Destination Main Manifest
       await this.executor.createDestinationMainManifest(this.context);
 
@@ -106,8 +120,26 @@ export class TransferJobExecutor {
 
       // Step 16: Finalize
       await this.executor.finalize(this.context);
+
+      // Trigger OnFinish
+      const finishTracker = this.job.options?.progressTracker;
+      if (finishTracker) {
+        await finishTracker.onFinish(
+          this.buildProgressSummary(),
+          this.buildVariantProgresses(),
+          true
+        );
+      }
     } catch (error) {
       this.handleError(error as Error);
+      const errTracker = this.job.options?.progressTracker;
+      if (errTracker) {
+        await errTracker.onFinish(
+          this.buildProgressSummary(),
+          this.buildVariantProgresses(),
+          false
+        );
+      }
       throw error;
     }
   }
@@ -231,6 +263,55 @@ export class TransferJobExecutor {
   }
 
   /**
+   * Helper to build the high level progress summary payload
+   */
+  private buildProgressSummary(): TransferProgressSummary {
+    const summary: TransferProgressSummary = {
+      totalChunks: this.overallProgress.totalChunks,
+      completedChunks: this.overallProgress.completedChunks,
+      failedChunks: 0, // We don't track fail counts well yet, will sum from variants:
+      totalExpectedBytes: 0,
+      totalWrittenBytes: this.overallProgress.transferredBytes,
+      variants: {}
+    };
+
+    let totalFailed = 0;
+
+    for (const [variant, progress] of this.variantProgressMap.entries()) {
+      summary.variants[variant.uri] = {
+        totalChunks: progress.totalChunks,
+        completedChunks: progress.completedChunks,
+        failedChunks: 0, // calculate if tracking failed chunks inside progress
+        totalExpectedBytes: progress.totalBytes,
+        totalWrittenBytes: progress.transferredBytes
+      };
+    }
+    summary.failedChunks = totalFailed;
+    return summary;
+  }
+
+  /**
+   * Helper to build the variant detail payloads
+   */
+  private buildVariantProgresses(): VariantTransferProgress[] {
+    const progresses: VariantTransferProgress[] = [];
+    for (const [variant, progress] of this.variantProgressMap.entries()) {
+      // For now we pass empty chunks dictionaries since we don't store them in memory.
+      // A complete implementation would store chunk objects or fire events.
+      progresses.push({
+        variantPath: variant.uri,
+        totalChunks: progress.totalChunks,
+        completedChunks: progress.completedChunks,
+        failedChunks: 0,
+        totalExpectedBytes: progress.totalBytes,
+        totalWrittenBytes: progress.transferredBytes,
+        chunks: {} // we will want to track chunks inside the map
+      });
+    }
+    return progresses;
+  }
+
+  /**
    * Process all chunks for a variant
    * Chunks are downloaded and stored in parallel with concurrency control
    */
@@ -293,6 +374,29 @@ export class TransferJobExecutor {
 
         this.reportVariantProgress(variant);
         this.reportOverallProgress();
+
+        const progressTracker = this.job.options?.progressTracker;
+        if (progressTracker) {
+          const total = this.overallProgress.totalChunks;
+          const completed = this.overallProgress.completedChunks;
+          const interval = Math.max(1, Math.floor(total / 10));
+          if (completed % interval === 0 || completed === total) {
+            const summary = this.buildProgressSummary();
+            if (variantProgress) {
+              const variantProgressDetails: VariantTransferProgress = {
+                variantPath: variant.uri,
+                totalChunks: variantProgress.totalChunks,
+                completedChunks: variantProgress.completedChunks,
+                failedChunks: 0,
+                totalExpectedBytes: variantProgress.totalBytes,
+                totalWrittenBytes: variantProgress.transferredBytes,
+                chunks: {}
+              };
+              await progressTracker.onProgress(summary, variantProgressDetails);
+            }
+          }
+        }
+
         return; // Success
       } catch (error) {
         lastError = error as Error;

@@ -38,11 +38,10 @@ export class OfetchFetcher implements Fetcher {
    */
   async fetch(url: string, context: TransferContext): Promise<FetchResponse> {
     const sourceConfig = context.config.source.config;
-    const headers = sourceConfig.headers || {};
 
     try {
       const response = await $fetch.raw(url, {
-        headers,
+        headers: sourceConfig.headers || {},
         timeout: sourceConfig.timeout,
         retry: sourceConfig.retry?.maxRetries || 0,
         retryDelay: sourceConfig.retry?.retryDelay || 1000,
@@ -60,6 +59,29 @@ export class OfetchFetcher implements Fetcher {
         (responseObj.headers as FetchResponse['headers']) || {};
       const status = responseObj.status || 200;
       const statusText = responseObj.statusText || 'OK';
+
+      let expectedBytes: number | undefined = undefined;
+      const headers = responseObj.headers;
+      if (headers) {
+        let contentLengthStr: string | null | undefined = undefined;
+        if (typeof (headers as Headers).get === 'function') {
+          contentLengthStr = (headers as Headers).get('content-length');
+        } else {
+          // Case-insensitive lookup for plain objects
+          const headerRecord = headers as Record<string, string>;
+          const key = Object.keys(headerRecord).find(k => k.toLowerCase() === 'content-length');
+          if (key) {
+            contentLengthStr = headerRecord[key];
+          }
+        }
+
+        if (contentLengthStr) {
+          const parsed = parseInt(contentLengthStr, 10);
+          if (!isNaN(parsed)) {
+            expectedBytes = parsed;
+          }
+        }
+      }
 
       return {
         text: async () => {
@@ -109,6 +131,7 @@ export class OfetchFetcher implements Fetcher {
         status,
         statusText,
         ok: status >= 200 && status < 300,
+        expectedBytes,
       };
     } catch (error) {
       const cause = error instanceof Error ? error : new Error(String(error));

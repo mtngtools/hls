@@ -117,12 +117,19 @@ describe('TransferJobExecutor Integration Tests', () => {
     const onError = vi.fn();
     const onOverallProgress = vi.fn();
     const onVariantProgress = vi.fn();
+    const mockProgressTracker = {
+      onStart: vi.fn().mockResolvedValue(undefined),
+      onProgress: vi.fn().mockResolvedValue(undefined),
+      onFinish: vi.fn().mockResolvedValue(undefined),
+    };
+
     const job: TransferJob = {
       transferConfig,
       options: {
         onOverallProgress,
         onVariantProgress,
         onError,
+        progressTracker: mockProgressTracker,
       },
     };
 
@@ -173,8 +180,13 @@ describe('TransferJobExecutor Integration Tests', () => {
     expect(mockStorage.getStoredFile('/tmp/hls-output/004.ts')).toBeDefined();
 
     // Verify progress callbacks were called
-    expect(job.options.onOverallProgress).toHaveBeenCalled();
-    expect(job.options.onVariantProgress).toHaveBeenCalled();
+    expect(job.options!.onOverallProgress).toHaveBeenCalled();
+    expect(job.options!.onVariantProgress).toHaveBeenCalled();
+
+    // Verify progress tracker called
+    expect(mockProgressTracker.onStart).toHaveBeenCalled();
+    expect(mockProgressTracker.onProgress).toHaveBeenCalled();
+    expect(mockProgressTracker.onFinish).toHaveBeenCalled();
   });
 
   it('should handle multiple variants', async () => {
@@ -243,7 +255,7 @@ describe('TransferJobExecutor Integration Tests', () => {
     await executor.execute();
 
     // Verify all variants were processed
-    const progressCalls = (job.options.onOverallProgress as ReturnType<typeof vi.fn>).mock.calls;
+    const progressCalls = (job.options!.onOverallProgress as ReturnType<typeof vi.fn>).mock.calls;
     const lastProgress = progressCalls[progressCalls.length - 1]?.[0];
     expect(lastProgress?.completedVariants).toBe(3);
     expect(lastProgress?.totalVariants).toBe(3);
@@ -354,9 +366,9 @@ describe('TransferJobExecutor Integration Tests', () => {
           maxConcurrent = Math.max(maxConcurrent, currentConcurrent);
           await new Promise((resolve) => setTimeout(resolve, 50)); // Simulate download time
           currentConcurrent--;
-          return HttpResponse.arrayBuffer(createMockChunkData(1024), {
+          return HttpResponse.arrayBuffer(createMockChunkData(1024).buffer as ArrayBuffer, {
             headers: { 'Content-Type': 'video/mp2t' },
-          });
+          }) as any;
         });
       },
     );

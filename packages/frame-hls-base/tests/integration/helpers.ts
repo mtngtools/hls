@@ -19,7 +19,7 @@ export class MockStorage implements Storage {
     stream: TransferStream,
     path: string,
     _context: TransferContext,
-  ): Promise<void> {
+  ): Promise<number> {
     // Convert stream to string
     const chunks: Uint8Array[] = [];
     if (stream && typeof (stream as { getReader?: unknown }).getReader === 'function') {
@@ -40,8 +40,10 @@ export class MockStorage implements Storage {
       }
     }
 
-    const content = Buffer.concat(chunks).toString('utf-8');
+    const buffer = Buffer.concat(chunks);
+    const content = buffer.toString('utf-8');
     this.storedFiles.set(path, content);
+    return buffer.length;
   }
 
   getStoredFile(path: string): string | undefined {

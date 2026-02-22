@@ -58,3 +58,11 @@ export {
   TransferError,
   ValidationError,
 } from './errors.js';
+
+// Progress types
+export type {
+  ChunkTransferStatus,
+  TransferProgressSummary,
+  VariantTransferProgress,
+  ProgressTracker,
+} from './progress.js';

@@ -159,7 +159,7 @@ export class DefaultPipelineExecutor implements PipelineExecutor {
     manifest: MainManifest | VariantManifest,
     path: string,
     context: TransferContext,
-  ): Promise<void> {
+  ): Promise<number> {
     if (this.plugins?.storeManifest) {
       return this.plugins.storeManifest(manifest, path, context);
     }
@@ -178,7 +178,7 @@ export class DefaultPipelineExecutor implements PipelineExecutor {
         this.push(null); // End stream
       },
     }) as TransferStream;
-    await this.defaults.storage.store(stream, path, context);
+    let bytesWritten = await this.defaults.storage.store(stream, path, context);
 
     // Store source manifest copy at {path}.source.txt when available
     const sourceContent =
@@ -190,8 +190,11 @@ export class DefaultPipelineExecutor implements PipelineExecutor {
           this.push(null);
         },
       }) as TransferStream;
-      await this.defaults.storage.store(sourceStream, `${path}.source.txt`, context);
+      const sourceBytes = await this.defaults.storage.store(sourceStream, `${path}.source.txt`, context);
+      bytesWritten += sourceBytes;
     }
+
+    return bytesWritten;
   }
 
   async createDestinationVariantManifest(
@@ -401,7 +404,7 @@ export class DefaultPipelineExecutor implements PipelineExecutor {
     path: string,
     chunk: Chunk,
     context: TransferContext,
-  ): Promise<void> {
+  ): Promise<number> {
     return (
       this.plugins?.storeChunk?.(stream, path, chunk, context) ??
       this.defaults.storage.store(stream, path, context)

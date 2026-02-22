@@ -96,7 +96,7 @@ describe('FsStorage', () => {
 
     expect(fs.mkdir).toHaveBeenCalledWith('/path/to', { recursive: true });
     expect(createWriteStream).toHaveBeenCalledWith('/path/to/file.txt');
-    expect(pipeline).toHaveBeenCalledWith(mockStream, mockWriteStream);
+    expect(pipeline).toHaveBeenCalledWith(mockStream, expect.anything(), mockWriteStream);
   });
 
   it('should convert Web ReadableStream to Node.js stream', async () => {
@@ -113,12 +113,12 @@ describe('FsStorage', () => {
     vi.mocked(fs.mkdir).mockResolvedValue(undefined);
     vi.mocked(createWriteStream).mockReturnValue(mockWriteStream as never);
     vi.mocked(pipeline).mockResolvedValue(undefined);
-    vi.mocked(Readable.fromWeb).mockReturnValue(mockNodeStream);
+    vi.mocked(Readable.fromWeb).mockReturnValue(mockNodeStream as never);
 
     await storage.store(mockWebStream as unknown as Readable, '/path/to/file.txt', mockContext);
 
-    expect(Readable.fromWeb).toHaveBeenCalledWith(mockWebStream);
-    expect(pipeline).toHaveBeenCalledWith(mockNodeStream, mockWriteStream);
+    expect(Readable.fromWeb).toHaveBeenCalledWith(mockWebStream as any);
+    expect(pipeline).toHaveBeenCalledWith(mockNodeStream, expect.anything(), mockWriteStream);
   });
 
   it('should create directory recursively', async () => {
@@ -175,5 +175,25 @@ describe('FsStorage', () => {
     await storage.store(mockStream, '/file.txt', mockContext);
 
     expect(fs.mkdir).toHaveBeenCalledWith('/', { recursive: true });
+  });
+
+  it('should calculate and return the exact number of bytes written', async () => {
+    const mockStream = createMockReadable(['test']);
+    const mockWriteStream = {
+      write: vi.fn(),
+      end: vi.fn(),
+    };
+
+    vi.mocked(fs.mkdir).mockResolvedValue(undefined);
+    vi.mocked(createWriteStream).mockReturnValue(mockWriteStream as never);
+    vi.mocked(pipeline).mockImplementation(async (source: any, tracker: any, dest: any) => {
+      // Simulate data passing through the middle tracker PassThrough stream
+      tracker.emit('data', Buffer.from('hello'));
+      tracker.emit('data', Buffer.from('world!'));
+    });
+
+    const bytes = await storage.store(mockStream, '/path/to/bytes.txt', mockContext);
+
+    expect(bytes).toBe(11); // "hello" (5) + "world!" (6)
   });
 });

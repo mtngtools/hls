@@ -223,4 +223,37 @@ describe('OfetchFetcher', () => {
 
     expect(text).toBe('test blob content');
   });
+
+  it('should parse expectedBytes from Headers object', async () => {
+    const headers = new Headers();
+    headers.set('Content-Length', '12345');
+
+    const mockResponse = {
+      _data: 'test',
+      headers,
+      status: 200,
+      statusText: 'OK',
+    };
+
+    vi.mocked($fetch.raw).mockResolvedValue(mockResponse as never);
+
+    const result = await fetcher.fetch('https://example.com/test', mockContext);
+
+    expect(result.expectedBytes).toBe(12345);
+  });
+
+  it('should parse expectedBytes from Record headers object ignoring case', async () => {
+    const mockResponse = {
+      _data: 'test',
+      headers: { 'content-length': '9876' },
+      status: 200,
+      statusText: 'OK',
+    };
+
+    vi.mocked($fetch.raw).mockResolvedValue(mockResponse as never);
+
+    const result = await fetcher.fetch('https://example.com/test', mockContext);
+
+    expect(result.expectedBytes).toBe(9876);
+  });
 });

@@ -50,6 +50,8 @@ export interface TransferJobOptions {
   onVariantProgress?: (progress: VariantProgress) => void;
   /** Callback for errors */
   onError?: (error: Error, context: TransferContext) => void;
+  /** Tracker for granular transfer status */
+  progressTracker?: import('./progress.js').ProgressTracker;
 }
 
 /**
@@ -94,6 +96,8 @@ export interface FetchResponse {
   statusText: string;
   /** Whether response is ok */
   ok: boolean;
+  /** Expected bytes from Content-Length header, if available */
+  expectedBytes?: number;
 }
 
 /**
@@ -125,9 +129,9 @@ export interface Storage {
    * @param stream - Stream of data to store
    * @param path - Destination path
    * @param context - Transfer context
-   * @returns Promise that resolves when storage is complete
+   * @returns Promise that resolves to the number of bytes written when storage is complete
    */
-  store(stream: TransferStream, path: string, context: TransferContext): Promise<void>;
+  store(stream: TransferStream, path: string, context: TransferContext): Promise<number>;
 }
 
 /**
@@ -218,7 +222,7 @@ export interface TransferPlugins {
     manifest: MainManifest | VariantManifest,
     path: string,
     context: TransferContext,
-  ) => Promise<void>;
+  ) => Promise<number>;
 
   /** Step 11: Create Destination Variant Manifest */
   createDestinationVariantManifest?: (
@@ -255,7 +259,7 @@ export interface TransferPlugins {
     path: string,
     chunk: Chunk,
     context: TransferContext,
-  ) => Promise<void>;
+  ) => Promise<number>;
 
   /** Step 16: Finalize */
   finalize?: (context: TransferContext) => Promise<void>;
@@ -329,7 +333,7 @@ export interface PipelineExecutor {
     manifest: MainManifest | VariantManifest,
     path: string,
     context: TransferContext,
-  ): Promise<void>;
+  ): Promise<number>;
 
   /** Step 11: Create Destination Variant Manifest */
   createDestinationVariantManifest(
@@ -363,7 +367,7 @@ export interface PipelineExecutor {
     path: string,
     chunk: Chunk,
     context: TransferContext,
-  ): Promise<void>;
+  ): Promise<number>;
 
   /** Step 16: Finalize */
   finalize(context: TransferContext): Promise<void>;
