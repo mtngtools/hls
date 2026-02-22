@@ -17,6 +17,7 @@ This package is the pure orchestration layer for HLS operations. It defines the 
                 * `maxConcurrentPerDomain` (planned for future only)
             * `retry`: Control `maxRetries` and `retryDelay`.
     * `plugins`: allows overriding any step of the multi-step pipeline.
+        * `verifyChunks` (optional): A bulk verification callback run just before writing the final status.json. Useful for validating written chunks (e.g., via `listObjectsV2` in AWS S3) all at once to minimize API calls.
     * `options`
         * `onOverallProgress`
         * `onVariantProgress`
@@ -61,7 +62,9 @@ This package is the pure orchestration layer for HLS operations. It defines the 
             *   Query parameters MUST be ignored for the filename.
             *   Filenames MUST be unique across the transfer job (achieved via subfolders per variant).
     *   **Step 16: Store Chunk**: `(stream, path, chunk, context) => Promise<void>`
-    *   **Step 17: Finalize**: `(context) => Promise<void>`
+    *   **Step 17: Verify Chunks (Optional)**: `(summary, variantProgresses, context) => Promise<void>`
+        *   **Requirement**: A plugin hook intended for bulk verification (e.g., calling `listObjectsV2` on a variant directory to verify file sizes). If implemented, the plugin updates `verifiedWrittenBytes` on the progress objects and optionally attaches raw validation payload arrays to `verificationSources`.
+    *   **Step 18: Finalize**: `(context) => Promise<void>`
 
 ## Progress Tracking
 
@@ -96,20 +99,23 @@ The top-level summary provides an overview of the entire job without the weight 
   "failedChunks": 0,
   "totalExpectedBytes": 104857600,
   "totalWrittenBytes": 10485760,
+  "verifiedWrittenBytes": 10485760,
   "variants": {
     "720p": {
       "totalChunks": 500,
       "completedChunks": 50,
       "failedChunks": 0,
       "totalExpectedBytes": 52428800,
-      "totalWrittenBytes": 5242880
+      "totalWrittenBytes": 5242880,
+      "verifiedWrittenBytes": 5242880
     },
     "1080p": {
       "totalChunks": 500,
       "completedChunks": 50,
       "failedChunks": 0,
       "totalExpectedBytes": 52428800,
-      "totalWrittenBytes": 5242880
+      "totalWrittenBytes": 5242880,
+      "verifiedWrittenBytes": 5242880
     }
   }
 }
@@ -127,10 +133,23 @@ The variant-specific files contain the detailed chunk transfer dictionary for th
   "failedChunks": 0,
   "totalExpectedBytes": 52428800,
   "totalWrittenBytes": 5242880,
+  "verifiedWrittenBytes": 5242880,
+  "verificationSources": [
+    {
+      "IsTruncated": false,
+      "Contents": [
+        {
+          "Key": "test-hls-e2e-1234/my-transfer/720p/000.ts",
+          "Size": 1048576
+        }
+      ]
+    }
+  ],
   "chunks": {
     "000.ts": {
       "expectedBytes": 1048576,
       "writtenBytes": 1048576,
+      "verifiedWrittenBytes": 1048576,
       "success": true
     },
     "001.ts": {
@@ -146,5 +165,7 @@ The variant-specific files contain the detailed chunk transfer dictionary for th
 - `chunks`: A dictionary of status objects, keyed by the chunk's filename (`000.ts`) relative to the variant folder.
 - `expectedBytes`: The derived size from the `Content-Length` response header.
 - `writtenBytes`: The actual bytes piped to the destination storage.
+- `verifiedWrittenBytes`: (Optional) The verified size derived from a bulk post-transfer check (e.g. S3 `listObjectsV2`).
+- `verificationSources`: (Optional) An array (`any[]`) of raw response payloads directly from the bulk verification plugin, stored without manipulation (e.g., an array of S3 `ListObjectsV2CommandOutput` objects including response metadata). Written only to the variant's final status file, not interim progress updates.
 - `success`: A boolean indicating if the chunk successfully transferred.
 - `errorCode`: An optional short string (e.g., `Timeout`, `StorageError`) if `success` is false.
