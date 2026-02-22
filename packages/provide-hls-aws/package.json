@@ -1,0 +1,44 @@
+{
+    "name": "@mtngtools/provide-hls-aws",
+    "version": "0.1.0",
+    "description": "AWS S3 implementation of HLS Storage",
+    "type": "module",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js"
+        }
+    },
+    "files": [
+        "dist"
+    ],
+    "scripts": {
+        "build": "vite build",
+        "dev": "vite build --watch",
+        "clean": "rimraf dist",
+        "typecheck": "tsc --noEmit",
+        "lint": "oxlint",
+        "test": "vitest run",
+        "test:watch": "vitest"
+    },
+    "dependencies": {
+        "@aws-sdk/client-s3": "^3.600.0",
+        "@aws-sdk/lib-storage": "^3.600.0",
+        "@mtngtools/utils-hls-types": "workspace:*"
+    },
+    "devDependencies": {
+        "@types/node": "^22.0.0"
+    },
+    "keywords": [
+        "hls",
+        "aws",
+        "s3",
+        "storage"
+    ],
+    "license": "MIT",
+    "publishConfig": {
+        "access": "public"
+    }
+}

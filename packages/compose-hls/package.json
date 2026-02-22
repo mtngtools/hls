@@ -1,0 +1,45 @@
+{
+    "name": "@mtngtools/compose-hls",
+    "version": "0.1.0",
+    "description": "Composed HLS core orchestrator with AWS S3 support",
+    "type": "module",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js"
+        }
+    },
+    "files": [
+        "dist"
+    ],
+    "scripts": {
+        "build": "vite build",
+        "dev": "vite build --watch",
+        "clean": "rimraf dist",
+        "typecheck": "tsc --noEmit",
+        "lint": "oxlint",
+        "test": "vitest run",
+        "test:watch": "vitest"
+    },
+    "dependencies": {
+        "@mtngtools/frame-hls-base": "workspace:*",
+        "@mtngtools/provide-hls-aws": "workspace:*",
+        "@mtngtools/utils-hls-types": "workspace:*"
+    },
+    "devDependencies": {
+        "@types/node": "^22.0.0"
+    },
+    "keywords": [
+        "hls",
+        "aws",
+        "s3",
+        "orchestrator",
+        "compose"
+    ],
+    "license": "MIT",
+    "publishConfig": {
+        "access": "public"
+    }
+}

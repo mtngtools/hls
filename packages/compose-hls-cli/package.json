@@ -1,0 +1,47 @@
+{
+    "name": "@mtngtools/compose-hls-cli",
+    "version": "0.1.0",
+    "description": "CLI extending frame-hls-cli with AWS S3 support",
+    "type": "module",
+    "bin": {
+        "compose-hls": "./dist/cli-entry.js"
+    },
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js"
+        }
+    },
+    "files": [
+        "dist"
+    ],
+    "scripts": {
+        "build": "vite build",
+        "dev": "vite build --watch",
+        "clean": "rimraf dist",
+        "typecheck": "tsc --noEmit",
+        "lint": "oxlint"
+    },
+    "dependencies": {
+        "@mtngtools/frame-hls-cli": "workspace:*",
+        "@mtngtools/compose-hls": "workspace:*",
+        "@mtngtools/utils-hls-core": "workspace:*",
+        "@mtngtools/utils-hls-types": "workspace:*"
+    },
+    "devDependencies": {
+        "@types/node": "^22.0.0"
+    },
+    "keywords": [
+        "hls",
+        "cli",
+        "aws",
+        "s3",
+        "compose"
+    ],
+    "license": "MIT",
+    "publishConfig": {
+        "access": "public"
+    }
+}
