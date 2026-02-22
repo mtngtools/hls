@@ -161,8 +161,6 @@ describe('ComposeStorage', () => {
     });
 
     it('should cleanly execute storage mapping alongside JsonProgressTracker output strings', async () => {
-        const storage = new ComposeStorage(mockBaseStorage);
-
         // Representing the E2E script explicitly bypassing ComposeStorage completely:
         const statusStoragePrefix = 'hls-transfer-test/status2026-02-22T17-37-33-574Z';
         const rawJsonBucket = new AwsS3Storage({
