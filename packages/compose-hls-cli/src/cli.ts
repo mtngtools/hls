@@ -2,11 +2,12 @@ import { ComposeHlsClient } from '@mtngtools/compose-hls';
 import { TransferJobExecutor } from '@mtngtools/utils-hls-core';
 import type { TransferJob, OverallProgress, VariantProgress } from '@mtngtools/utils-hls-types';
 import { type CliArgs, loadConfig, createTransferConfig } from '@mtngtools/frame-hls-cli';
+import type { ComposeCliArgs } from './options.js';
 
 /**
  * Execute transfer command using ComposeHlsClient
  */
-export async function executeTransfer(args: CliArgs): Promise<void> {
+export async function executeTransfer(args: CliArgs, composeArgs?: ComposeCliArgs): Promise<void> {
     try {
         // Load config file if provided
         const configFile = args.config ? loadConfig(args.config) : undefined;
@@ -22,6 +23,28 @@ export async function executeTransfer(args: CliArgs): Promise<void> {
             },
             configFile,
         );
+
+        if (composeArgs) {
+            // Apply compose specific config overrides over standard pipeline arguments
+            if (composeArgs.m3u8Name) {
+                transferConfig.destination.m3u8Name = composeArgs.m3u8Name.replace('.m3u8', '');
+            }
+
+            if (typeof transferConfig.destination.config === 'object') {
+                const composeConfig = transferConfig.destination.config as Record<string, unknown>;
+
+                if (composeArgs.autoVerifyChunks !== undefined) {
+                    composeConfig.autoVerifyChunks = composeArgs.autoVerifyChunks;
+                }
+
+                if (composeArgs.acl) {
+                    composeConfig.additionalPutObjectParams = {
+                        ...(composeConfig.additionalPutObjectParams as object || {}),
+                        ACL: composeArgs.acl
+                    };
+                }
+            }
+        }
 
         // Create HLS client with Compose AWS capabilities
         const client = new ComposeHlsClient();
