@@ -13,6 +13,7 @@ It bridges core capabilities of base utilities and AWS-specific logic without in
 *   **Setup**: It will act as a drop-in replacement or wrapper for `frame-hls-base` functions.
 *   **Composition Setup**: Leverages transfer orchestration, chunk filtering, and manifest parsing logic identically from `frame-hls-base`.
 *   **Extended Capabilities**: Automatically provisions an `AwsS3Storage` (from `provide-hls-aws`) when detecting `s3://` specific destination configurations, or similarly explicitly requested S3 destinations.
+    *   **Auto-Verification**: Injects the `AwsS3ChunkVerificationPlugin` during the `verifyChunks` pipeline step when S3 destinations are used, automatically confirming transferred chunks against the S3 `listObjectsV2` API. This behavior can be disabled natively by setting `autoVerifyChunks: false` in the destination config.
 
 ## Usage
 

@@ -26,6 +26,7 @@ This package acts as the default entry point for most consumers. It combines the
 
 ### Main Manifest Naming
 - The main manifest is named `main.m3u8` by default, regardless of the source filename, to provide a standardized entry point.
+- Consumers can override this behavior by supplying an `m3u8Name` inside the `DestinationConfig` object (e.g., `m3u8Name: 'index'` generates `index.m3u8`).
 - The original source filename is ignored unless a plugin overrides this behavior.
 
 ## Implementation Details
