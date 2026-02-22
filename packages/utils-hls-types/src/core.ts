@@ -39,6 +39,8 @@ export interface VariantProgress {
   totalBytes: number;
   /** Bytes transferred for this variant */
   transferredBytes: number;
+  /** Detailed metadata per chunk by filename */
+  chunks: Record<string, import('./progress.js').ChunkTransferStatus>;
 }
 
 /**

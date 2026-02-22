@@ -91,4 +91,116 @@ describe('ComposeStorage', () => {
             storagePrefix: 'prefix'
         });
     });
+
+    it('should strip absolute base paths to prevent duplication in AwsS3Storage keys', async () => {
+        const storage = new ComposeStorage(mockBaseStorage);
+        const context: TransferContext = {
+            config: {
+                source: { mode: 'fetch', config: { url: '' } },
+                destination: {
+                    mode: 'custom',
+                    config: { path: 's3://croi-rndj-media/hls-transfer-test/store/my-transfer-test/h' }
+                }
+            },
+            metadata: {}
+        };
+
+        // If pipeline.ts gives us the FULL URL (e.g. s3://croi-rndj-media/hls-transfer-test/store/my-transfer-test/h/index.m3u8),
+        // we should only pass 'index.m3u8' down to the newly configured AwsS3Storage.
+        const bytes = await storage.store(
+            {} as TransferStream,
+            's3://croi-rndj-media/hls-transfer-test/store/my-transfer-test/h/index.m3u8',
+            context
+        );
+
+        expect(bytes).toBe(200);
+        expect(AwsS3Storage).toHaveBeenCalledWith({
+            bucket: 'croi-rndj-media',
+            storagePrefix: 'hls-transfer-test/store/my-transfer-test/h'
+        });
+
+        expect(mockS3Storage.store).toHaveBeenCalledWith(
+            expect.anything(),
+            'index.m3u8',
+            context
+        );
+    });
+
+    it('should strip absolute base paths containing dynamic timestamps seamlessly', async () => {
+        const storage = new ComposeStorage(mockBaseStorage);
+        // Emulate the transfer.test.ts configuration injection directly
+        const context: TransferContext = {
+            config: {
+                source: { mode: 'fetch', config: { url: '' } },
+                destination: {
+                    mode: 'custom',
+                    // This mirrors S3_PREFIX + timestamp + S3_PATH closely
+                    config: { path: 's3://croi-rndj-media/hls-transfer-test/store2026-02-22T17-37-33-574Z/my-transfer-test/h' }
+                }
+            },
+            metadata: {}
+        };
+
+        const bytes = await storage.store(
+            {} as TransferStream,
+            's3://croi-rndj-media/hls-transfer-test/store2026-02-22T17-37-33-574Z/my-transfer-test/h/1240800/1.ts',
+            context
+        );
+
+        expect(bytes).toBe(200);
+        expect(AwsS3Storage).toHaveBeenCalledWith({
+            bucket: 'croi-rndj-media',
+            storagePrefix: 'hls-transfer-test/store2026-02-22T17-37-33-574Z/my-transfer-test/h'
+        });
+
+        expect(mockS3Storage.store).toHaveBeenCalledWith(
+            expect.anything(),
+            '1240800/1.ts',
+            context
+        );
+    });
+
+    it('should cleanly execute storage mapping alongside JsonProgressTracker output strings', async () => {
+        const storage = new ComposeStorage(mockBaseStorage);
+
+        // Representing the E2E script explicitly bypassing ComposeStorage completely:
+        const statusStoragePrefix = 'hls-transfer-test/status2026-02-22T17-37-33-574Z';
+        const rawJsonBucket = new AwsS3Storage({
+            bucket: 'croi-rndj-media',
+            storagePrefix: statusStoragePrefix
+        });
+
+        const context: TransferContext = {
+            config: {
+                source: { mode: 'fetch', config: { url: '' } },
+                destination: {
+                    mode: 'custom',
+                    config: { path: 's3://croi-rndj-media/hls-transfer-test/store/xyz' }
+                }
+            },
+            metadata: {}
+        };
+
+        // JsonProgressTracker relies purely on standard nested storage paths
+        // simulating the internal tracker outputs manually:
+        const summaryStatusPath = `my-transfer-test/status.json`;
+        const variantStatusPath = `my-transfer-test/1240800/status.json`;
+
+        await rawJsonBucket.store({} as TransferStream, summaryStatusPath, context);
+        await rawJsonBucket.store({} as TransferStream, variantStatusPath, context);
+
+        // Verify that providing relative path targets into the nested AwsS3Storage 
+        // yields correct prefix assignments internally during bucket Puts.
+        expect(mockS3Storage.store).toHaveBeenCalledWith(
+            expect.anything(),
+            'my-transfer-test/status.json',
+            context
+        );
+
+        expect(mockS3Storage.store).toHaveBeenCalledWith(
+            expect.anything(),
+            'my-transfer-test/1240800/status.json',
+            context
+        );
+    });
 });

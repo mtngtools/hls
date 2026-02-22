@@ -145,16 +145,22 @@ export class DefaultPipelineExecutor implements PipelineExecutor {
       return this.plugins.generateMainManifestPath(sourcePath, manifest, context);
     }
 
-    // Default: use standardized 'main.m3u8' as the main manifest name
-    // The user explicitly requested to avoid using the original source filename
-    const fileName = 'main.m3u8';
+    // Capture the custom manifest name if provided by the user configs:
+    // DestConfig extends FetchConfig | FileConfig | CustomConfig, but m3u8Name is on the parent DestinationConfig!
+    const m3u8Name = context.config.destination.m3u8Name || 'main';
     const destConfig = context.config.destination.config;
+
     if ('path' in destConfig) {
-      // FileConfig
-      return `${destConfig.path}/${fileName}`;
+      // FileConfig / CustomConfig with Path
+      return `${destConfig.path}/${m3u8Name}.m3u8`;
     }
-    // For other config types, preserve source path
-    return sourcePath;
+
+    // For other config types, append it strictly replacing the original source path
+    const pathParts = sourcePath.split('/');
+    pathParts.pop(); // Remove the original filename
+    // Standardize URL structures correctly if needed, or string concats
+    const basePath = pathParts.join('/');
+    return basePath ? `${basePath}/${m3u8Name}.m3u8` : `${m3u8Name}.m3u8`;
   }
 
   async storeManifest(
@@ -245,13 +251,23 @@ export class DefaultPipelineExecutor implements PipelineExecutor {
       return `${subfolder}index.m3u8`;
     }
 
-    const fileName = this.getFileName(sourcePath) || 'variant.m3u8';
+    const m3u8Name = context.config.destination.m3u8Name || 'main';
+
+    let fileName = this.getFileName(sourcePath);
+    if (!fileName || fileName === `${m3u8Name}.m3u8`) {
+      fileName = 'variant.m3u8';
+    }
+
+    const pathParts = sourcePath.split('/');
+    pathParts.pop(); // remove original filename
+    const folderPrefix = pathParts.length > 0 ? `${pathParts.join('/')}/` : '';
+
     const destConfig = context.config.destination.config;
     if ('path' in destConfig) {
       // FileConfig
-      return `${destConfig.path}/${fileName}`;
+      return `${destConfig.path}/${folderPrefix}${fileName}`;
     }
-    return sourcePath;
+    return folderPrefix ? `${folderPrefix}${fileName}` : sourcePath;
   }
 
   async downloadChunk(chunk: Chunk, context: TransferContext): Promise<TransferStream> {
@@ -370,7 +386,16 @@ export class DefaultPipelineExecutor implements PipelineExecutor {
     // 3. Determine parent folder based on variant
     // If variant.uri is absolute, we used a subfolder for it, so chunks go there too
     const isVariantAbsolute = variant.uri.match(/^https?:\/\//);
-    const subfolder = isVariantAbsolute ? this.getVariantPath(variant) : '';
+    let subfolder = '';
+
+    if (isVariantAbsolute) {
+      subfolder = this.getVariantPath(variant);
+    } else {
+      // use the relative directory from the original variant URI
+      const pathParts = variant.uri.split('/');
+      pathParts.pop();
+      subfolder = pathParts.length > 0 ? `${pathParts.join('/')}/` : '';
+    }
 
     const destConfig = context.config.destination.config;
     if ('path' in destConfig) {

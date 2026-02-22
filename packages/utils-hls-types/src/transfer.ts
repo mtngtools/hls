@@ -66,6 +66,12 @@ export interface DestinationConfig {
   mode: DestinationMode;
   /** Mode-specific configuration */
   config: FetchConfig | FileConfig | CustomConfig;
+  /** 
+   * Optional custom name for the main manifest file 
+   * Exclude the generic `.m3u8` suffix as it is appended dynamically.
+   * Defaults to 'main' across core integrations.
+   */
+  m3u8Name?: string;
 }
 
 /**

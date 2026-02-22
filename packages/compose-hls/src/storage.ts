@@ -21,33 +21,38 @@ export class ComposeStorage implements Storage {
         }
 
         if (path.startsWith('s3://') || context.config.destination.mode === 's3' as 'custom') {
-            const cacheKey = path;
-            if (this.s3StorageCache.has(cacheKey)) {
-                return this.s3StorageCache.get(cacheKey)!;
-            }
-
             let bucket = '';
             let storagePrefix = '';
+            let additionalPutObjectParams: any = undefined;
 
             if (path.startsWith('s3://')) {
                 const url = new URL(path);
                 bucket = url.hostname;
                 storagePrefix = url.pathname.substring(1); // remove leading slash
-            } else {
-                // Mode is s3 but path doesn't start with s3:// ?
-                // Try to pull explicit bucket from config if available
-                if (typeof destConfig === 'object' && destConfig !== null && 'bucket' in destConfig) {
+            }
+
+            if (typeof destConfig === 'object' && destConfig !== null) {
+                if (!bucket && 'bucket' in destConfig) {
                     bucket = destConfig.bucket as string;
                 }
-                if (typeof destConfig === 'object' && destConfig !== null && 'storagePrefix' in destConfig) {
+                if (!storagePrefix && 'storagePrefix' in destConfig) {
                     storagePrefix = destConfig.storagePrefix as string;
                 }
+                if ('additionalPutObjectParams' in destConfig) {
+                    additionalPutObjectParams = destConfig.additionalPutObjectParams;
+                }
+            }
+
+            const cacheKey = path + (additionalPutObjectParams ? JSON.stringify(additionalPutObjectParams) : '');
+            if (this.s3StorageCache.has(cacheKey)) {
+                return this.s3StorageCache.get(cacheKey)!;
             }
 
             if (bucket) {
                 const s3Storage = new AwsS3Storage({
                     bucket,
-                    storagePrefix: storagePrefix || undefined
+                    storagePrefix: storagePrefix || undefined,
+                    ...(additionalPutObjectParams ? { additionalPutObjectParams } : {})
                 });
 
                 this.s3StorageCache.set(cacheKey, s3Storage);
@@ -61,7 +66,24 @@ export class ComposeStorage implements Storage {
     async store(stream: TransferStream, path: string, context: TransferContext): Promise<number> {
         const s3Storage = this.getS3Storage(context);
         if (s3Storage) {
-            return s3Storage.store(stream, path, context);
+            let relativePath = path;
+            const destConfig = context.config.destination.config;
+            let basePath = '';
+
+            if (typeof destConfig === 'object' && destConfig !== null && 'path' in destConfig) {
+                basePath = destConfig.path as string;
+            } else if (typeof destConfig === 'string') {
+                basePath = destConfig;
+            }
+
+            if (basePath && relativePath.startsWith(basePath)) {
+                relativePath = relativePath.substring(basePath.length);
+                if (relativePath.startsWith('/')) {
+                    relativePath = relativePath.substring(1);
+                }
+            }
+
+            return s3Storage.store(stream, relativePath, context);
         }
         return this.baseStorage.store(stream, path, context);
     }

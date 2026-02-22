@@ -118,10 +118,13 @@ export class TransferJobExecutor {
       // Process variants in parallel (with concurrency limit)
       await this.processVariants(filteredVariants);
 
+      const finalSummary = this.buildProgressSummary();
+      const finalVariantProgresses = this.buildVariantProgresses();
+
       // Step 17: Verify Chunks (Optional)
       await this.executor.verifyChunks(
-        this.buildProgressSummary(),
-        this.buildVariantProgresses(),
+        finalSummary,
+        finalVariantProgresses,
         this.context
       );
 
@@ -132,8 +135,8 @@ export class TransferJobExecutor {
       const finishTracker = this.job.options?.progressTracker;
       if (finishTracker) {
         await finishTracker.onFinish(
-          this.buildProgressSummary(),
-          this.buildVariantProgresses(),
+          finalSummary,
+          finalVariantProgresses,
           true
         );
       }
@@ -175,6 +178,7 @@ export class TransferJobExecutor {
         completedChunks: 0,
         totalBytes: 0,
         transferredBytes: 0,
+        chunks: {},
       });
     }
   }
@@ -285,7 +289,7 @@ export class TransferJobExecutor {
     let totalFailed = 0;
 
     for (const [variant, progress] of this.variantProgressMap.entries()) {
-      summary.variants[variant.uri] = {
+      summary.variants[this.getVariantFolderName(variant)] = {
         totalChunks: progress.totalChunks,
         completedChunks: progress.completedChunks,
         failedChunks: 0, // calculate if tracking failed chunks inside progress
@@ -306,13 +310,13 @@ export class TransferJobExecutor {
       // For now we pass empty chunks dictionaries since we don't store them in memory.
       // A complete implementation would store chunk objects or fire events.
       progresses.push({
-        variantPath: variant.uri,
+        variantPath: this.getVariantFolderName(variant),
         totalChunks: progress.totalChunks,
         completedChunks: progress.completedChunks,
         failedChunks: 0,
         totalExpectedBytes: progress.totalBytes,
         totalWrittenBytes: progress.transferredBytes,
-        chunks: {} // we will want to track chunks inside the map
+        chunks: { ...progress.chunks } // Clone dictionary to safely transport chunk metrics
       });
     }
     return progresses;
@@ -366,7 +370,7 @@ export class TransferJobExecutor {
         );
 
         // Step 15: Store Chunk (with concurrency control)
-        await this.destinationSemaphore.execute(() =>
+        const bytesWritten = await this.destinationSemaphore.execute(() =>
           this.executor.storeChunk(stream, chunkPath, chunk, this.context),
         );
 
@@ -374,9 +378,16 @@ export class TransferJobExecutor {
         const variantProgress = this.variantProgressMap.get(variant);
         if (variantProgress) {
           variantProgress.completedChunks++;
+          variantProgress.transferredBytes += bytesWritten;
+
+          const chunkFileName = chunkPath.split('/').pop() || chunk.uri;
+          variantProgress.chunks[chunkFileName] = {
+            writtenBytes: bytesWritten,
+            success: true
+          };
+
           this.overallProgress.completedChunks++;
-          // Note: Byte tracking would require stream size, which is complex
-          // For now, we track chunk count
+          this.overallProgress.transferredBytes += bytesWritten;
         }
 
         this.reportVariantProgress(variant);
@@ -391,7 +402,7 @@ export class TransferJobExecutor {
             const summary = this.buildProgressSummary();
             if (variantProgress) {
               const variantProgressDetails: VariantTransferProgress = {
-                variantPath: variant.uri,
+                variantPath: this.getVariantFolderName(variant),
                 totalChunks: variantProgress.totalChunks,
                 completedChunks: variantProgress.completedChunks,
                 failedChunks: 0,
@@ -447,6 +458,21 @@ export class TransferJobExecutor {
         this.job.options.onVariantProgress({ ...progress });
       }
     }
+  }
+
+  /**
+   * Helper to determine clean variant folder name for progress tracking
+   */
+  private getVariantFolderName(variant: Variant): string {
+    const isAbsolute = variant.uri.match(/^https?:\/\//);
+    if (isAbsolute) {
+      // Use bandwidth as folder identifier for absolute URLs
+      return variant.bandwidth ? `${variant.bandwidth}` : 'variant';
+    }
+    // For relative URIs, extract the directory path without trailing slash
+    const pathParts = variant.uri.split('/');
+    pathParts.pop(); // Remove filename
+    return pathParts.length > 0 ? pathParts.join('/') : 'variant';
   }
 
   /**

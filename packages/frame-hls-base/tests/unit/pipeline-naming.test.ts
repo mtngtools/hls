@@ -114,5 +114,48 @@ describe('Pipeline Naming Logic', () => {
             // getVariantPath returns `${bandwidth}/`
             expect(path).toBe('/tmp/out/5000000/001.ts');
         });
+
+        it('should extract target directories accurately tracking relative output paths from variants exactly mirroring E2E architectures', async () => {
+            const nestedVariant: Variant = {
+                uri: '1240800/index.m3u8',
+                bandwidth: 1240800,
+            };
+
+            const chunk: Chunk = {
+                duration: 10,
+                uri: '0.ts',
+            };
+
+            // Emulate the E2E explicit target path context.
+            const e2eContext: TransferContext = {
+                config: {
+                    source: { mode: 'fetch', config: { url: 'https://example.com/main.m3u8' } },
+                    destination: {
+                        mode: 'custom',
+                        config: { path: 's3://croi-rndj-media/store2026/my-transfer-test/h' }
+                    }
+                },
+                metadata: {},
+            };
+
+            const chunkPath = await executor.generateChunkPath(
+                'https://example.com/1240800/0.ts',
+                nestedVariant,
+                mockManifest,
+                chunk,
+                e2eContext
+            );
+
+            expect(chunkPath).toBe('s3://croi-rndj-media/store2026/my-transfer-test/h/1240800/0.ts');
+
+            // Verify variant manifest generates identically:
+            const variantPath = await executor.generateVariantManifestPath(
+                '1240800/index.m3u8',
+                nestedVariant,
+                e2eContext
+            );
+
+            expect(variantPath).toBe('s3://croi-rndj-media/store2026/my-transfer-test/h/1240800/index.m3u8');
+        });
     });
 });
