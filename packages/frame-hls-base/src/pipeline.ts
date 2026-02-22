@@ -16,6 +16,8 @@ import type {
   VariantManifest,
   Chunk,
   TransferStream,
+  TransferProgressSummary,
+  VariantTransferProgress,
 } from '@mtngtools/utils-hls-types';
 
 /**
@@ -409,6 +411,19 @@ export class DefaultPipelineExecutor implements PipelineExecutor {
       this.plugins?.storeChunk?.(stream, path, chunk, context) ??
       this.defaults.storage.store(stream, path, context)
     );
+  }
+
+  async verifyChunks(
+    summary: TransferProgressSummary,
+    variantProgresses: VariantTransferProgress[],
+    context: TransferContext,
+  ): Promise<void> {
+    if (this.plugins?.verifyChunks) {
+      return this.plugins.verifyChunks(summary, variantProgresses, context);
+    }
+
+    // Default: no-op
+    return Promise.resolve();
   }
 
   async finalize(context: TransferContext): Promise<void> {

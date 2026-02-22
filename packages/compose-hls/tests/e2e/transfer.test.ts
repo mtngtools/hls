@@ -49,7 +49,8 @@ d('ComposeHlsClient E2E Transfer', () => {
         });
 
         // Utilize the JsonProgressTracker which now targets S3 directly!
-        const progressTracker = new JsonProgressTracker(statusStorage, STATUS_PATH!);
+        const mockContext = { config: transferConfig, metadata: {} };
+        const progressTracker = new JsonProgressTracker(statusStorage, STATUS_PATH!, mockContext);
 
         const job: TransferJob = {
             transferConfig,

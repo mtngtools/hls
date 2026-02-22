@@ -8,10 +8,9 @@ import { createWriteStream } from 'node:fs';
 import { Readable } from 'node:stream';
 import { FsStorage } from '../../src/storage.js';
 import type { TransferContext } from '@mtngtools/utils-hls-types';
-import { StorageError } from '@mtngtools/utils-hls-types';
 
 // Create a mock readable stream helper
-function createMockReadable(data: string[]): NodeJS.ReadableStream {
+function createMockReadable(_data: string[]): NodeJS.ReadableStream {
   // Use a simple object that implements the ReadableStream interface
   const stream = {
     readable: true,
@@ -186,8 +185,9 @@ describe('FsStorage', () => {
 
     vi.mocked(fs.mkdir).mockResolvedValue(undefined);
     vi.mocked(createWriteStream).mockReturnValue(mockWriteStream as never);
-    vi.mocked(pipeline).mockImplementation(async (source: any, tracker: any, dest: any) => {
+    vi.mocked(pipeline).mockImplementation(async (...args: any[]) => {
       // Simulate data passing through the middle tracker PassThrough stream
+      const tracker = args[1];
       tracker.emit('data', Buffer.from('hello'));
       tracker.emit('data', Buffer.from('world!'));
     });

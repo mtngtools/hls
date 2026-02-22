@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { resolveUrl } from '@/url.js';
+import { resolveUrl } from '../../src/url.js';
 import { ValidationError } from '@mtngtools/utils-hls-types';
 
 describe('resolveUrl', () => {

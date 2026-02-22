@@ -44,7 +44,7 @@ describe('JsonProgressTracker', () => {
         await tracker.onStart(100);
 
         expect(mockStorage.store).toHaveBeenCalledTimes(1);
-        const [stream, path, context] = vi.mocked(mockStorage.store).mock.calls[0];
+        const [stream, path, context] = vi.mocked(mockStorage.store).mock.calls[0]!;
 
         expect(path).toBe(`${basePath}/${mockedDateStr}-job/interim/status.json`);
         expect(context).toBe(mockContext);
@@ -93,13 +93,13 @@ describe('JsonProgressTracker', () => {
         expect(mockStorage.store).toHaveBeenCalledTimes(2);
 
         // Check high-level summary
-        const [summaryStream, summaryPath] = vi.mocked(mockStorage.store).mock.calls[0];
+        const [summaryStream, summaryPath] = vi.mocked(mockStorage.store).mock.calls[0]!;
         expect(summaryPath).toBe(`${basePath}/${mockedDateStr}-job/interim/status.json`);
         const storedSummary = await readJsonFromStream(summaryStream);
         expect(storedSummary).toEqual(mockSummary);
 
         // Check variant detailed status
-        const [variantStream, variantPath] = vi.mocked(mockStorage.store).mock.calls[1];
+        const [variantStream, variantPath] = vi.mocked(mockStorage.store).mock.calls[1]!;
         expect(variantPath).toBe(`${basePath}/${mockedDateStr}-job/interim/720p/status.json`);
         const storedVariant = await readJsonFromStream(variantStream);
         expect(storedVariant).toEqual(mockVariantProgress);
@@ -139,13 +139,13 @@ describe('JsonProgressTracker', () => {
 
         expect(mockStorage.store).toHaveBeenCalledTimes(3);
 
-        const call1 = vi.mocked(mockStorage.store).mock.calls[0];
+        const call1 = vi.mocked(mockStorage.store).mock.calls[0]!;
         expect(call1[1]).toBe(`${basePath}/${mockedDateStr}-job/status.json`);
 
-        const call2 = vi.mocked(mockStorage.store).mock.calls[1];
+        const call2 = vi.mocked(mockStorage.store).mock.calls[1]!;
         expect(call2[1]).toBe(`${basePath}/${mockedDateStr}-job/720p/status.json`);
 
-        const call3 = vi.mocked(mockStorage.store).mock.calls[2];
+        const call3 = vi.mocked(mockStorage.store).mock.calls[2]!;
         expect(call3[1]).toBe(`${basePath}/${mockedDateStr}-job/1080p/status.json`);
     });
 });

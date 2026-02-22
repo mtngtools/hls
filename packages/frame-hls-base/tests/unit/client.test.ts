@@ -30,7 +30,7 @@ describe('HlsClient', () => {
   });
 
   it('should create client with default implementations', () => {
-    const client = new HlsClient();
+    new HlsClient();
 
     expect(OfetchFetcher).toHaveBeenCalled();
     expect(FsStorage).toHaveBeenCalled();

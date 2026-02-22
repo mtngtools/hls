@@ -87,8 +87,6 @@ describe('Semaphore', () => {
 
     it('should release permit even if function throws', async () => {
       const semaphore = new Semaphore(1);
-      let released = false;
-
       const releaseSpy = vi.spyOn(semaphore, 'release');
 
       try {

@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import type { Mocked } from 'vitest';
 import { ComposeStorage } from '../../src/storage.js';
 import { AwsS3Storage } from '@mtngtools/provide-hls-aws';
 import type { Storage, TransferStream, TransferContext } from '@mtngtools/utils-hls-types';
@@ -6,7 +7,7 @@ import type { Storage, TransferStream, TransferContext } from '@mtngtools/utils-
 vi.mock('@mtngtools/provide-hls-aws');
 
 describe('ComposeStorage', () => {
-    let mockBaseStorage: vi.Mocked<Storage>;
+    let mockBaseStorage: Mocked<Storage>;
     let mockS3Storage: any;
 
     beforeEach(() => {

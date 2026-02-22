@@ -11,7 +11,8 @@
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
     "clean": "turbo run clean",
-    "prepublishOnly": "pnpm run typecheck && pnpm run lint && pnpm run build && pnpm run test"
+    "prepublishOnly": "pnpm run typecheck && pnpm run test:typecheck && pnpm run lint && pnpm run build && pnpm run test",
+    "test:typecheck": "turbo run test:typecheck"
   },
   "keywords": [
     "hls",

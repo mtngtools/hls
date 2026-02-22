@@ -118,7 +118,14 @@ export class TransferJobExecutor {
       // Process variants in parallel (with concurrency limit)
       await this.processVariants(filteredVariants);
 
-      // Step 16: Finalize
+      // Step 17: Verify Chunks (Optional)
+      await this.executor.verifyChunks(
+        this.buildProgressSummary(),
+        this.buildVariantProgresses(),
+        this.context
+      );
+
+      // Step 18: Finalize
       await this.executor.finalize(this.context);
 
       // Trigger OnFinish

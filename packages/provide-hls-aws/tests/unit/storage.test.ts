@@ -83,7 +83,7 @@ describe('AwsS3Storage', () => {
             const bodyStream = options.params.Body as PassThrough;
             return {
                 done: async () => {
-                    for await (const chunk of bodyStream) { } // drain the stream
+                    for await (const _chunk of bodyStream) { } // drain the stream
                     return mockUploadDone();
                 },
                 on: vi.fn()

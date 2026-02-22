@@ -6,7 +6,6 @@
 import { http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
 import type { RequestHandler } from 'msw';
-import { Readable } from 'node:stream';
 import type { Storage, TransferContext, TransferStream } from '@mtngtools/utils-hls-types';
 
 /**
@@ -106,16 +105,16 @@ export function createHandlers(options: {
     // Resolve chunk path relative to baseUrl (chunks are in same directory as variant)
     const chunkUrl = new URL(path, baseUrl).href;
     handlers.push(
-      http.get(chunkUrl, () => {
+      http.get(chunkUrl, (() => {
         if (typeof content === 'string') {
           return HttpResponse.text(content, {
             headers: { 'Content-Type': 'video/mp2t' },
           });
         }
-        return HttpResponse.arrayBuffer(content, {
+        return HttpResponse.arrayBuffer(content.buffer as ArrayBuffer, {
           headers: { 'Content-Type': 'video/mp2t' },
         });
-      }),
+      }) as any),
     );
   }
 

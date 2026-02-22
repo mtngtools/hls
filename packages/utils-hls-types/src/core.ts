@@ -5,6 +5,7 @@
 
 import type { MainManifest, Variant, VariantManifest, Chunk } from './parser.js';
 import type { TransferConfig } from './transfer.js';
+import type { TransferProgressSummary, VariantTransferProgress } from './progress.js';
 
 /**
  * Progress information for overall transfer
@@ -261,7 +262,14 @@ export interface TransferPlugins {
     context: TransferContext,
   ) => Promise<number>;
 
-  /** Step 16: Finalize */
+  /** Step 17: Verify Chunks (Optional) */
+  verifyChunks?: (
+    summary: TransferProgressSummary,
+    variantProgresses: VariantTransferProgress[],
+    context: TransferContext,
+  ) => Promise<void>;
+
+  /** Step 18: Finalize */
   finalize?: (context: TransferContext) => Promise<void>;
 }
 
@@ -369,7 +377,14 @@ export interface PipelineExecutor {
     context: TransferContext,
   ): Promise<number>;
 
-  /** Step 16: Finalize */
+  /** Step 17: Verify Chunks (Optional) */
+  verifyChunks(
+    summary: TransferProgressSummary,
+    variantProgresses: VariantTransferProgress[],
+    context: TransferContext,
+  ): Promise<void>;
+
+  /** Step 18: Finalize */
   finalize(context: TransferContext): Promise<void>;
 }
 

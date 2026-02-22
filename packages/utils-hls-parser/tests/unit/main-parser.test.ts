@@ -43,7 +43,7 @@ describe('parseMainManifest', () => {
     const content = readFileSync(resolve(fixturesDir, 'main.m3u8'), 'utf-8');
     const manifest = await parseMainManifest(content, context);
 
-    const variant1 = manifest.variants[0];
+    const variant1 = manifest.variants[0]!;
     expect(variant1.bandwidth).toBe(1280000);
     expect(variant1.averageBandwidth).toBe(1000000);
     expect(variant1.codecs).toBe('avc1.42e01e,mp4a.40.2');

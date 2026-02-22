@@ -14,6 +14,8 @@ export interface AwsS3StorageOptions extends AwsRegionAndCredentials {
     s3Client?: S3Client;
     bucket: string;
     storagePrefix?: string;
+    /** Whether to automatically execute chunk verification plugin after transfer */
+    autoVerifyChunks?: boolean;
 }
 
 export class AwsS3Storage implements Storage {

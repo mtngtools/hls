@@ -10,6 +10,8 @@ export interface ChunkTransferStatus {
     expectedBytes?: number;
     /** Actual bytes successfully written to storage */
     writtenBytes: number;
+    /** (Optional) Actual bytes verified post-transfer by bulk validation */
+    verifiedWrittenBytes?: number;
     /** Whether the chunk transfer was successful */
     success: boolean;
     /** Error code if failed (omitted message for size) */
@@ -30,6 +32,8 @@ export interface TransferProgressSummary {
     totalExpectedBytes: number;
     /** Total bytes successfully written across all variants */
     totalWrittenBytes: number;
+    /** (Optional) Total bytes verified successfully across all variants */
+    verifiedWrittenBytes?: number;
     /** 
      * High-level summary of each variant's progress
      * Keyed by the variant's destination directory name (e.g. '720p')
@@ -40,6 +44,7 @@ export interface TransferProgressSummary {
         failedChunks: number;
         totalExpectedBytes: number;
         totalWrittenBytes: number;
+        verifiedWrittenBytes?: number;
     }>;
 }
 
@@ -59,6 +64,10 @@ export interface VariantTransferProgress {
     totalExpectedBytes: number;
     /** Total bytes successfully written in this variant */
     totalWrittenBytes: number;
+    /** (Optional) Total bytes verified in this variant */
+    verifiedWrittenBytes?: number;
+    /** (Optional) Raw response payloads from the bulk verification plugin */
+    verificationSources?: any[];
     /** 
      * Dictionary of chunk statuses for this variant,
      * keyed by the chunk's filename relative to the variant folder (e.g. '000.ts')

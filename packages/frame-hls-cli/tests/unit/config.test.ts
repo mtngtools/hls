@@ -4,7 +4,6 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
 import { loadConfig, createTransferConfig } from '../../src/config.js';
 
 vi.mock('node:fs');

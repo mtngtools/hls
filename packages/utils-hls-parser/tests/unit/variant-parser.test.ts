@@ -46,12 +46,12 @@ describe('parseVariantManifest', () => {
     const content = readFileSync(resolve(fixturesDir, 'variant.m3u8'), 'utf-8');
     const manifest = await parseVariantManifest(content, variant, context);
 
-    const chunk1 = manifest.chunks[0];
+    const chunk1 = manifest.chunks[0]!;
     expect(chunk1.duration).toBe(10.0);
     expect(chunk1.uri).toBe('segment001.ts');
     expect(chunk1.discontinuity).toBeUndefined();
 
-    const chunk3 = manifest.chunks[2];
+    const chunk3 = manifest.chunks[2]!;
     expect(chunk3.discontinuity).toBe(true);
   });
 
@@ -59,7 +59,7 @@ describe('parseVariantManifest', () => {
     const content = readFileSync(resolve(fixturesDir, 'variant.m3u8'), 'utf-8');
     const manifest = await parseVariantManifest(content, variant, context);
 
-    const chunk1 = manifest.chunks[0];
+    const chunk1 = manifest.chunks[0]!;
     expect(chunk1.key).toBeDefined();
     expect(chunk1.key?.method).toBe('AES-128');
     expect(chunk1.key?.uri).toBe('https://example.com/key');
@@ -70,7 +70,7 @@ describe('parseVariantManifest', () => {
     const content = readFileSync(resolve(fixturesDir, 'variant.m3u8'), 'utf-8');
     const manifest = await parseVariantManifest(content, variant, context);
 
-    const chunk1 = manifest.chunks[0];
+    const chunk1 = manifest.chunks[0]!;
     expect(chunk1.map).toBeDefined();
     expect(chunk1.map?.uri).toBe('init.mp4');
     expect(chunk1.map?.byteRange).toEqual({ length: 1000, offset: 0 });

@@ -1,48 +1,49 @@
 {
-  "name": "@mtngtools/frame-hls-cli",
-  "version": "0.1.0",
-  "description": "Basic CLI for HLS transfer (no custom transfer options)",
-  "type": "module",
-  "bin": {
-    "hls-base": "./dist/cli.js"
-  },
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+    "name": "@mtngtools/frame-hls-cli",
+    "version": "0.1.0",
+    "description": "Basic CLI for HLS transfer (no custom transfer options)",
+    "type": "module",
+    "bin": {
+        "hls-base": "./dist/cli.js"
+    },
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js"
+        }
+    },
+    "files": [
+        "dist"
+    ],
+    "scripts": {
+        "build": "vite build",
+        "dev": "vite build --watch",
+        "clean": "rimraf dist",
+        "typecheck": "tsc --noEmit",
+        "lint": "oxlint",
+        "test": "vitest run",
+        "test:watch": "vitest",
+        "test:e2e": "E2E_ENABLED=true vitest run",
+        "test:typecheck": "tsc -p tsconfig.test.json"
+    },
+    "dependencies": {
+        "@mtngtools/utils-hls-types": "workspace:*",
+        "@mtngtools/utils-hls-parser": "workspace:*",
+        "@mtngtools/frame-hls-base": "workspace:*",
+        "@mtngtools/utils-hls-core": "workspace:*"
+    },
+    "keywords": [
+        "hls",
+        "cli",
+        "command-line"
+    ],
+    "license": "MIT",
+    "publishConfig": {
+        "access": "public"
+    },
+    "devDependencies": {
+        "@types/node": "^25.1.0"
     }
-  },
-  "files": [
-    "dist"
-  ],
-  "scripts": {
-    "build": "vite build",
-    "dev": "vite build --watch",
-    "clean": "rimraf dist",
-    "typecheck": "tsc --noEmit",
-    "lint": "oxlint",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:e2e": "E2E_ENABLED=true vitest run"
-  },
-  "dependencies": {
-    "@mtngtools/utils-hls-types": "workspace:*",
-    "@mtngtools/utils-hls-parser": "workspace:*",
-    "@mtngtools/frame-hls-base": "workspace:*",
-    "@mtngtools/utils-hls-core": "workspace:*"
-  },
-  "keywords": [
-    "hls",
-    "cli",
-    "command-line"
-  ],
-  "license": "MIT",
-  "publishConfig": {
-    "access": "public"
-  },
-  "devDependencies": {
-    "@types/node": "^25.1.0"
-  }
 }
