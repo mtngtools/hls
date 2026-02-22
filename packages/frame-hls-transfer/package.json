@@ -1,6 +1,6 @@
 {
     "name": "@mtngtools/frame-hls-transfer",
-    "version": "0.0.1-experimental.1",
+    "version": "0.0.1-experimental.2",
     "description": "HLS transfer implementations (fetch, storage)",
     "type": "module",
     "main": "./dist/index.js",
