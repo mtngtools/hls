@@ -1,6 +1,6 @@
 {
     "name": "@mtngtools/frame-hls-cli",
-    "version": "0.1.0",
+    "version": "0.0.1-experimental.0",
     "description": "Basic CLI for HLS transfer (no custom transfer options)",
     "type": "module",
     "bin": {
@@ -26,7 +26,8 @@
         "test": "vitest run",
         "test:watch": "vitest",
         "test:e2e": "E2E_ENABLED=true vitest run",
-        "test:typecheck": "tsc -p tsconfig.test.json"
+        "test:typecheck": "tsc -p tsconfig.test.json",
+        "publish:experimental": "pnpm publish --tag experimental --access public"
     },
     "dependencies": {
         "@mtngtools/utils-hls-types": "workspace:*",

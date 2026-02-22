@@ -1,6 +1,6 @@
 {
     "name": "@mtngtools/provide-hls-aws",
-    "version": "0.1.0",
+    "version": "0.0.1-experimental.0",
     "description": "AWS S3 implementation of HLS Storage",
     "type": "module",
     "main": "./dist/index.js",
@@ -22,7 +22,8 @@
         "lint": "oxlint",
         "test": "vitest run",
         "test:watch": "vitest",
-        "test:typecheck": "tsc -p tsconfig.test.json"
+        "test:typecheck": "tsc -p tsconfig.test.json",
+        "publish:experimental": "pnpm publish --tag experimental --access public"
     },
     "dependencies": {
         "@aws-sdk/client-s3": "^3.600.0",

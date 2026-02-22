@@ -1,6 +1,6 @@
 {
     "name": "@mtngtools/utils-hls-core",
-    "version": "0.1.0",
+    "version": "0.0.1-experimental.0",
     "description": "HLS pipeline orchestration and interfaces",
     "type": "module",
     "main": "./dist/index.js",
@@ -23,7 +23,8 @@
         "test": "vitest run",
         "test:watch": "vitest",
         "test:e2e": "E2E_ENABLED=true vitest run",
-        "test:typecheck": "tsc -p tsconfig.test.json"
+        "test:typecheck": "tsc -p tsconfig.test.json",
+        "publish:experimental": "pnpm publish --tag experimental --access public"
     },
     "dependencies": {
         "@mtngtools/utils-hls-types": "workspace:*"
