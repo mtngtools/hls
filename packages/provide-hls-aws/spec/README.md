@@ -13,7 +13,7 @@ It is designed to be utilized as the `Storage` dependency for HLS chunks and sta
 The options interface aligns with `mtng-unstorage`'s S3 configuration to ensure consistency across the mono repo. For now, this interface is duplicated here, though it may be extracted into a common libraries repo later.
 
 ```typescript
-import { S3Client } from '@aws-sdk/client-s3';
+import { S3Client, type PutObjectCommandInput } from '@aws-sdk/client-s3';
 
 export interface AwsRegionAndCredentials {
   accessKeyId?: string;
@@ -26,6 +26,11 @@ export interface AwsS3StorageOptions extends AwsRegionAndCredentials {
   s3Client?: S3Client;
   bucket: string;
   storagePrefix?: string;
+  /**
+   * Additional parameters to pass to the underlying PutObjectCommand.
+   * Note: Bucket, Key, and Body are managed internally and cannot be overridden.
+   */
+  additionalPutObjectParams?: Omit<PutObjectCommandInput, 'Bucket' | 'Key' | 'Body'>;
   /**
    * Whether to automatically attach the AwsS3ChunkVerificationPlugin to the transfer.
    * Note: This only applies when this storage options object is configuring the Destination

@@ -25,8 +25,11 @@ d('ComposeHlsClient E2E Transfer', () => {
 
         const client = new ComposeHlsClient();
 
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const s3PrefixStr = S3_PREFIX ? S3_PREFIX : '';
+
         // Let's create an s3:// formatted path to trigger ComposeStorage dynamically mapping to AwsS3Storage
-        const s3DestinationPath = `s3://${S3_BUCKET}/${S3_PREFIX ? S3_PREFIX + '/' : ''}${S3_PATH}`;
+        const s3DestinationPath = `s3://${S3_BUCKET}/${s3PrefixStr}${timestamp}/${S3_PATH}`;
 
         const transferConfig: TransferConfig = {
             source: {
@@ -43,9 +46,10 @@ d('ComposeHlsClient E2E Transfer', () => {
         };
 
         // Initialize actual AwsS3Storage for the status tracker independently 
+        const statusPrefixStr = STATUS_PREFIX ? STATUS_PREFIX : '';
         const statusStorage = new AwsS3Storage({
             bucket: STATUS_BUCKET!,
-            storagePrefix: STATUS_PREFIX
+            storagePrefix: `${statusPrefixStr}${timestamp}`
         });
 
         // Utilize the JsonProgressTracker which now targets S3 directly!

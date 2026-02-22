@@ -1,5 +1,5 @@
 import type { Storage, TransferStream, TransferContext } from '@mtngtools/utils-hls-types';
-import { S3Client } from '@aws-sdk/client-s3';
+import { S3Client, type PutObjectCommandInput } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 import { PassThrough } from 'node:stream';
 
@@ -16,6 +16,8 @@ export interface AwsS3StorageOptions extends AwsRegionAndCredentials {
     storagePrefix?: string;
     /** Whether to automatically execute chunk verification plugin after transfer */
     autoVerifyChunks?: boolean;
+    /** Additional parameters to pass to the underlying PutObjectCommand */
+    additionalPutObjectParams?: Omit<PutObjectCommandInput, 'Bucket' | 'Key' | 'Body'>;
 }
 
 export class AwsS3Storage implements Storage {
@@ -103,6 +105,7 @@ export class AwsS3Storage implements Storage {
         const upload = new Upload({
             client: this.client,
             params: {
+                ...this.options.additionalPutObjectParams,
                 Bucket: this.options.bucket,
                 Key: finalKey,
                 Body: tracker,
