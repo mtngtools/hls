@@ -25,7 +25,7 @@ Consult [`README.md`](./README.md) and [`package.json`](./package.json) as best 
 ## Package-specific rules
 
 - Basic CLI for common HLS transfer (default implementations only; no custom transfer options like AWS)
-- Not actively developed; for provider-specific CLIs, see main monorepo
+- Not actively developed; use or build `compose-hls-cli` or similar composite CLIs.
 - Can depend on other packages in this monorepo
 
 ----

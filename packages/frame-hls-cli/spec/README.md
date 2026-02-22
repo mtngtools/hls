@@ -2,7 +2,7 @@
 
 **Package**: `@mtngtools/frame-hls-cli`
 
-**Note:** This is a **basic CLI** without custom transfer options (e.g. AWS). It is **not actively developed**. For provider-specific transfers, use or build a CLI in the main monorepo that composes `frame-hls-base` with packages such as `provide-aws-hls`.
+**Note:** This is a **basic CLI**. It is **not actively developed**. For provider-specific transfers, use the `compose-hls-cli` package which composes `frame-hls-base` with packages such as `provide-hls-aws`.
 
 ## Overview
 

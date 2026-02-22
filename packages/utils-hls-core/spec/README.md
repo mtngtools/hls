@@ -62,3 +62,89 @@ This package is the pure orchestration layer for HLS operations. It defines the 
             *   Filenames MUST be unique across the transfer job (achieved via subfolders per variant).
     *   **Step 16: Store Chunk**: `(stream, path, chunk, context) => Promise<void>`
     *   **Step 17: Finalize**: `(context) => Promise<void>`
+
+## Progress Tracking
+
+The orchestration layer supports a `transfer-progress` pluggable tracking system designed to monitor and serialize chunk transfer statuses. 
+
+### JSON Tracker File Structure
+
+When a JSON progress tracker is utilized (e.g., `JsonProgressTracker`), it will write `.json` files to a specified `Storage` interface. The tracker maintains a high-level `status.json` and individual detailed `status.json` files for each variant, storing intermittent updates in an `interim/` directory during the transfer.
+
+```
+{basePath}/
+  └── {timestamp}-job/            # e.g. 2026-02-21T23-10-05Z-job/
+      ├── status.json             # High-level summary (updated iteratively, final moved here)
+      ├── 720p/
+      │   └── status.json         # Final variant chunk status
+      └── interim/
+          ├── status.json         # Interim high-level summary
+          └── 720p/
+              └── status.json     # Interim variant chunk status (updated e.g. every 10%)
+```
+
+### JSON Payload Schemas
+
+#### High-Level `status.json`
+
+The top-level summary provides an overview of the entire job without the weight of thousands of chunk keys:
+
+```json
+{
+  "totalChunks": 1000,
+  "completedChunks": 100,
+  "failedChunks": 0,
+  "totalExpectedBytes": 104857600,
+  "totalWrittenBytes": 10485760,
+  "variants": {
+    "720p": {
+      "totalChunks": 500,
+      "completedChunks": 50,
+      "failedChunks": 0,
+      "totalExpectedBytes": 52428800,
+      "totalWrittenBytes": 5242880
+    },
+    "1080p": {
+      "totalChunks": 500,
+      "completedChunks": 50,
+      "failedChunks": 0,
+      "totalExpectedBytes": 52428800,
+      "totalWrittenBytes": 5242880
+    }
+  }
+}
+```
+
+#### Variant-Level `{variant}/status.json`
+
+The variant-specific files contain the detailed chunk transfer dictionary for that specific variant:
+
+```json
+{
+  "variantPath": "720p",
+  "totalChunks": 500,
+  "completedChunks": 50,
+  "failedChunks": 0,
+  "totalExpectedBytes": 52428800,
+  "totalWrittenBytes": 5242880,
+  "chunks": {
+    "000.ts": {
+      "expectedBytes": 1048576,
+      "writtenBytes": 1048576,
+      "success": true
+    },
+    "001.ts": {
+      "expectedBytes": 1048576,
+      "writtenBytes": 2048,
+      "success": false,
+      "errorCode": "ECONNRESET"
+    }
+  }
+}
+```
+
+- `chunks`: A dictionary of status objects, keyed by the chunk's filename (`000.ts`) relative to the variant folder.
+- `expectedBytes`: The derived size from the `Content-Length` response header.
+- `writtenBytes`: The actual bytes piped to the destination storage.
+- `success`: A boolean indicating if the chunk successfully transferred.
+- `errorCode`: An optional short string (e.g., `Timeout`, `StorageError`) if `success` is false.
