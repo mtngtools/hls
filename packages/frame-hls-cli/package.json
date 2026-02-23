@@ -1,6 +1,6 @@
 {
     "name": "@mtngtools/frame-hls-cli",
-    "version": "0.0.1-experimental.2",
+    "version": "0.0.1-experimental.3",
     "description": "Basic CLI for HLS transfer (no custom transfer options)",
     "type": "module",
     "bin": {

@@ -1,6 +1,6 @@
 {
     "name": "@mtngtools/compose-hls-cli",
-    "version": "0.0.1-experimental.2",
+    "version": "0.0.1-experimental.3",
     "description": "CLI extending frame-hls-cli with AWS S3 support",
     "type": "module",
     "bin": {

@@ -1,6 +1,6 @@
 {
     "name": "@mtngtools/compose-hls",
-    "version": "0.0.1-experimental.2",
+    "version": "0.0.1-experimental.3",
     "description": "Composed HLS core orchestrator with AWS S3 support",
     "type": "module",
     "main": "./dist/index.js",

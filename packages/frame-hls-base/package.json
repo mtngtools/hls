@@ -1,6 +1,6 @@
 {
     "name": "@mtngtools/frame-hls-base",
-    "version": "0.0.1-experimental.2",
+    "version": "0.0.1-experimental.3",
     "description": "Default HLS client implementation (Core + Transfer)",
     "type": "module",
     "main": "./dist/index.js",
