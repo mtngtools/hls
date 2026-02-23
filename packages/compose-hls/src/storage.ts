@@ -20,6 +20,8 @@ export class ComposeStorage implements Storage {
             path = destConfig;
         }
 
+        console.log(`[ComposeStorage] Evaluating destination mode: '${context.config.destination.mode}', path: '${path}'`);
+
         if (path.startsWith('s3://') || context.config.destination.mode === 's3' as 'custom') {
             let bucket = '';
             let storagePrefix = '';
@@ -43,6 +45,8 @@ export class ComposeStorage implements Storage {
                 }
             }
 
+            console.log(`[ComposeStorage] Found S3 match. Bucket: '${bucket}', Prefix: '${storagePrefix}'`);
+
             const cacheKey = path + (additionalPutObjectParams ? JSON.stringify(additionalPutObjectParams) : '');
             if (this.s3StorageCache.has(cacheKey)) {
                 return this.s3StorageCache.get(cacheKey)!;
@@ -57,7 +61,11 @@ export class ComposeStorage implements Storage {
 
                 this.s3StorageCache.set(cacheKey, s3Storage);
                 return s3Storage;
+            } else {
+                console.log(`[ComposeStorage] S3 matched but no bucket found! Falling back to base storage.`);
             }
+        } else {
+            console.log(`[ComposeStorage] No S3 match found. Using base storage (likely FsStorage).`);
         }
 
         return null;

@@ -26,8 +26,9 @@
         "publish:experimental": "pnpm publish --tag experimental --access public"
     },
     "dependencies": {
-        "@mtngtools/frame-hls-cli": "workspace:*",
         "@mtngtools/compose-hls": "workspace:*",
+        "@mtngtools/frame-hls-cli": "workspace:*",
+        "@mtngtools/provide-hls-aws": "workspace:0.0.1-experimental.3",
         "@mtngtools/utils-hls-core": "workspace:*",
         "@mtngtools/utils-hls-types": "workspace:*"
     },

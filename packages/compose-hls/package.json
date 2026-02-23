@@ -15,6 +15,7 @@
         "dist"
     ],
     "scripts": {
+        "example:advanced-s3": "tsx examples/advanced-s3.ts",
         "build": "vite build",
         "dev": "vite build --watch",
         "clean": "rimraf dist",

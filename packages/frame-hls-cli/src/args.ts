@@ -15,6 +15,8 @@ export interface CliArgs {
   maxRetries?: number;
   /** Retry delay in milliseconds */
   retryDelay?: number;
+  /** Target main manifest filename override */
+  m3u8Name?: string;
   /** Verbose output */
   verbose?: boolean;
   /** Quiet mode (minimal output) */
@@ -59,6 +61,13 @@ export function parseArgs(argv: string[]): CliArgs {
         process.exit(1);
       }
       args.retryDelay = parseInt(next, 10);
+    } else if (arg === '--m3u8-name' || arg === '-m') {
+      const next = argv[++i];
+      if (!next) {
+        console.error(`Error: ${arg} requires a value`);
+        process.exit(1);
+      }
+      args.m3u8Name = next;
     } else if (arg === '--verbose' || arg === '-v') {
       args.verbose = true;
     } else if (arg === '--quiet' || arg === '-q') {
@@ -108,6 +117,7 @@ Options:
   -j, --max-concurrent    Maximum concurrent downloads (default: 5)
   -r, --max-retries       Maximum retries per chunk (default: 3)
   --retry-delay <ms>      Delay between retries in milliseconds (default: 1000)
+  -m, --m3u8-name <name>  Override the target master manifest filename
   -v, --verbose           Verbose output
   -q, --quiet             Quiet mode (minimal output)
   -h, --help              Show this help message

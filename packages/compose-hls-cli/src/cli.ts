@@ -1,5 +1,6 @@
 import { ComposeHlsClient } from '@mtngtools/compose-hls';
-import { TransferJobExecutor } from '@mtngtools/utils-hls-core';
+import { TransferJobExecutor, JsonProgressTracker } from '@mtngtools/utils-hls-core';
+import { AwsS3Storage } from '@mtngtools/provide-hls-aws';
 import type { TransferJob, OverallProgress, VariantProgress } from '@mtngtools/utils-hls-types';
 import { type CliArgs, loadConfig, createTransferConfig } from '@mtngtools/frame-hls-cli';
 import type { ComposeCliArgs } from './options.js';
@@ -73,6 +74,15 @@ export async function executeTransfer(args: CliArgs, composeArgs?: ComposeCliArg
                 },
             },
         };
+
+        if (composeArgs?.statusBucket) {
+            const statusStorage = new AwsS3Storage({
+                bucket: composeArgs.statusBucket,
+                storagePrefix: composeArgs.statusPrefix,
+            });
+            // We pass an empty context since this runs in the CLI outside the pipeline hooks context
+            job.options!.progressTracker = new JsonProgressTracker(statusStorage, '', { metadata: {}, config: transferConfig } as any);
+        }
 
         // Create executor
         const executor = new TransferJobExecutor(job, client.getExecutor());
