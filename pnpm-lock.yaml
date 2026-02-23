@@ -28,16 +28,19 @@ importers:
         version: 5.9.3
       vite:
         specifier: 8.0.0-beta.15
-        version: 8.0.0-beta.15(@types/node@25.1.0)(esbuild@0.27.2)
+        version: 8.0.0-beta.15(@types/node@25.1.0)(esbuild@0.27.2)(tsx@4.21.0)
       vite-plugin-dts:
         specifier: ^4.5.4
-        version: 4.5.4(@types/node@25.1.0)(rollup@4.54.0)(typescript@5.9.3)(vite@8.0.0-beta.15(@types/node@25.1.0)(esbuild@0.27.2))
+        version: 4.5.4(@types/node@25.1.0)(rollup@4.54.0)(typescript@5.9.3)(vite@8.0.0-beta.15(@types/node@25.1.0)(esbuild@0.27.2)(tsx@4.21.0))
       vitest:
         specifier: ^2.0.0
         version: 2.1.9(@types/node@25.1.0)(@vitest/ui@2.1.9)(lightningcss@1.31.1)(msw@2.12.7(@types/node@25.1.0)(typescript@5.9.3))
 
   packages/compose-hls:
     dependencies:
+      '@aws-sdk/client-s3':
+        specifier: ^3.600.0
+        version: 3.995.0
       '@mtngtools/frame-hls-base':
         specifier: workspace:*
         version: link:../frame-hls-base
@@ -66,6 +69,9 @@ importers:
       '@mtngtools/frame-hls-cli':
         specifier: workspace:*
         version: link:../frame-hls-cli
+      '@mtngtools/provide-hls-aws':
+        specifier: workspace:*
+        version: link:../provide-hls-aws
       '@mtngtools/utils-hls-core':
         specifier: workspace:*
         version: link:../utils-hls-core
@@ -1865,6 +1871,9 @@ packages:
     resolution: {integrity: sha512-ts6Wi+2j3jQjqi70w5AlN8DFnkSwC+MqmxEzdEALB2qXZYV3X/b1CTfgPLGJNMeAWxdPfU8FO1ms3NUfaHCPYg==}
     engines: {node: '>=10'}
 
+  get-tsconfig@4.13.6:
+    resolution: {integrity: sha512-shZT/QMiSHc/YBLxxOkMtgSid5HFoauqCE3/exfsEcwg1WkeqjG+V40yBbBrsD+jW2HDXcs28xOfcbm2jI8Ddw==}
+
   get-uri@6.0.5:
     resolution: {integrity: sha512-b1O07XYq8eRuVzBNgJLstU6FYc1tS6wnMtF1I1D9lE8LxZSOGZ7LhxN54yPP6mGw5f2CkXY2BQUL9Fx41qvcIg==}
     engines: {node: '>= 14'}
@@ -2423,6 +2432,9 @@ packages:
     resolution: {integrity: sha512-Xf0nWe6RseziFMu+Ap9biiUbmplq6S9/p+7w7YXP/JBHhrUDDUhwa+vANyubuqfZWTveU//DYVGsDG7RKL/vEw==}
     engines: {node: '>=0.10.0'}
 
+  resolve-pkg-maps@1.0.0:
+    resolution: {integrity: sha512-seS2Tj26TBVOC2NIc2rOe2y2ZO7efxITtLZcGSOnHHNOQ7CkiUBfw0Iw2ck6xkIhPwLhKNLS8BO+hEpngQlqzw==}
+
   resolve@1.22.11:
     resolution: {integrity: sha512-RfqAvLnMl313r7c9oclB1HhUEAezcpLjz95wFH4LVuhk9JF/r22qmVP9AMmOU4vMX7Q8pN8jwNg/CSpdFnMjTQ==}
     engines: {node: '>= 0.4'}
@@ -2694,6 +2706,11 @@ packages:
 
   tslib@2.8.1:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
+
+  tsx@4.21.0:
+    resolution: {integrity: sha512-5C1sg4USs1lfG0GFb2RLXsdpXqBSEhAaA/0kPL01wxzpMqLILNxIxIOKiILz+cdg/pLnOUxFYOR5yhHU666wbw==}
+    engines: {node: '>=18.0.0'}
+    hasBin: true
 
   turbo-darwin-64@2.7.2:
     resolution: {integrity: sha512-dxY3X6ezcT5vm3coK6VGixbrhplbQMwgNsCsvZamS/+/6JiebqW9DKt4NwpgYXhDY2HdH00I7FWs3wkVuan4rA==}
@@ -4982,6 +4999,11 @@ snapshots:
 
   get-stream@6.0.1: {}
 
+  get-tsconfig@4.13.6:
+    dependencies:
+      resolve-pkg-maps: 1.0.0
+    optional: true
+
   get-uri@6.0.5:
     dependencies:
       basic-ftp: 5.1.0
@@ -5605,6 +5627,9 @@ snapshots:
 
   require-from-string@2.0.2: {}
 
+  resolve-pkg-maps@1.0.0:
+    optional: true
+
   resolve@1.22.11:
     dependencies:
       is-core-module: 2.16.1
@@ -5881,6 +5906,14 @@ snapshots:
 
   tslib@2.8.1: {}
 
+  tsx@4.21.0:
+    dependencies:
+      esbuild: 0.27.2
+      get-tsconfig: 4.13.6
+    optionalDependencies:
+      fsevents: 2.3.3
+    optional: true
+
   turbo-darwin-64@2.7.2:
     optional: true
 
@@ -5990,7 +6023,7 @@ snapshots:
       - supports-color
       - terser
 
-  vite-plugin-dts@4.5.4(@types/node@25.1.0)(rollup@4.54.0)(typescript@5.9.3)(vite@8.0.0-beta.15(@types/node@25.1.0)(esbuild@0.27.2)):
+  vite-plugin-dts@4.5.4(@types/node@25.1.0)(rollup@4.54.0)(typescript@5.9.3)(vite@8.0.0-beta.15(@types/node@25.1.0)(esbuild@0.27.2)(tsx@4.21.0)):
     dependencies:
       '@microsoft/api-extractor': 7.55.2(@types/node@25.1.0)
       '@rollup/pluginutils': 5.3.0(rollup@4.54.0)
@@ -6003,7 +6036,7 @@ snapshots:
       magic-string: 0.30.21
       typescript: 5.9.3
     optionalDependencies:
-      vite: 8.0.0-beta.15(@types/node@25.1.0)(esbuild@0.27.2)
+      vite: 8.0.0-beta.15(@types/node@25.1.0)(esbuild@0.27.2)(tsx@4.21.0)
     transitivePeerDependencies:
       - '@types/node'
       - rollup
@@ -6029,7 +6062,7 @@ snapshots:
       fsevents: 2.3.3
       lightningcss: 1.31.1
 
-  vite@8.0.0-beta.15(@types/node@25.1.0)(esbuild@0.27.2):
+  vite@8.0.0-beta.15(@types/node@25.1.0)(esbuild@0.27.2)(tsx@4.21.0):
     dependencies:
       '@oxc-project/runtime': 0.114.0
       lightningcss: 1.31.1
@@ -6041,6 +6074,7 @@ snapshots:
       '@types/node': 25.1.0
       esbuild: 0.27.2
       fsevents: 2.3.3
+      tsx: 4.21.0
 
   vitest@2.1.9(@types/node@22.19.11)(@vitest/ui@2.1.9)(lightningcss@1.31.1)(msw@2.12.7(@types/node@22.19.11)(typescript@5.9.3)):
     dependencies:

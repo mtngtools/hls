@@ -150,17 +150,29 @@ export class DefaultPipelineExecutor implements PipelineExecutor {
     const m3u8Name = context.config.destination.m3u8Name || 'main';
     const destConfig = context.config.destination.config;
 
-    if ('path' in destConfig) {
+    if ('path' in destConfig && destConfig.path) {
       // FileConfig / CustomConfig with Path
-      return `${destConfig.path}/${m3u8Name}.m3u8`;
+      const targetPath = destConfig.path as string;
+
+      // If the path already has a .m3u8 extension, the user provided a full explicit filename route
+      if (targetPath.endsWith('.m3u8')) {
+        // If they provided a custom m3u8Name as well, override the filename portion but keep the path
+        if (context.config.destination.m3u8Name) {
+          const parts = targetPath.split('/');
+          parts.pop();
+          return parts.length > 0 ? `${parts.join('/')}/${m3u8Name}.m3u8` : `${m3u8Name}.m3u8`;
+        }
+        return targetPath;
+      }
+
+      // Otherwise, assume it's a directory and append the intended filename
+      const separator = targetPath.endsWith('/') ? '' : '/';
+      return `${targetPath}${separator}${m3u8Name}.m3u8`;
     }
 
-    // For other config types, append it strictly replacing the original source path
-    const pathParts = sourcePath.split('/');
-    pathParts.pop(); // Remove the original filename
-    // Standardize URL structures correctly if needed, or string concats
-    const basePath = pathParts.join('/');
-    return basePath ? `${basePath}/${m3u8Name}.m3u8` : `${m3u8Name}.m3u8`;
+    // Default for direct storage paths: just output the file name. 
+    // The bucket prefix or target directory is handled natively by the Storage instances.
+    return `${m3u8Name}.m3u8`;
   }
 
   async storeManifest(
@@ -238,36 +250,17 @@ export class DefaultPipelineExecutor implements PipelineExecutor {
       return this.plugins.generateVariantManifestPath(sourcePath, variant, context);
     }
 
-    // Default: use subfolder structure for absolute URLs or if requested
-    // If variant.uri is absolute, we MUST use a subfolder to avoid collisions
-    const isAbsolute = variant.uri.match(/^https?:\/\//);
-
-    if (isAbsolute) {
-      const subfolder = this.getVariantPath(variant);
-      const destConfig = context.config.destination.config;
-      if ('path' in destConfig) {
-        return `${destConfig.path}/${subfolder}index.m3u8`;
-      }
-      return `${subfolder}index.m3u8`;
-    }
-
-    const m3u8Name = context.config.destination.m3u8Name || 'main';
-
-    let fileName = this.getFileName(sourcePath);
-    if (!fileName || fileName === `${m3u8Name}.m3u8`) {
-      fileName = 'variant.m3u8';
-    }
-
-    const pathParts = sourcePath.split('/');
-    pathParts.pop(); // remove original filename
-    const folderPrefix = pathParts.length > 0 ? `${pathParts.join('/')}/` : '';
+    // Default: use subfolder structure based on variant descriptors, not the URI.
+    // This assigns variants into clean isolated folders based on their properties.
+    const subfolder = this.getVariantPath(variant);
+    const destFileName = 'index.m3u8';
 
     const destConfig = context.config.destination.config;
     if ('path' in destConfig) {
-      // FileConfig
-      return `${destConfig.path}/${folderPrefix}${fileName}`;
+      return `${destConfig.path}/${subfolder}${destFileName}`;
     }
-    return folderPrefix ? `${folderPrefix}${fileName}` : sourcePath;
+
+    return `${subfolder}${destFileName}`;
   }
 
   async downloadChunk(chunk: Chunk, context: TransferContext): Promise<TransferStream> {
@@ -360,15 +353,6 @@ export class DefaultPipelineExecutor implements PipelineExecutor {
     return newManifest;
   }
 
-  /**
-   * Extracts the filename from a given path.
-   * @param path The full path or URL.
-   * @returns The filename, or an empty string if not found.
-   */
-  private getFileName(path: string): string {
-    return path.split('/').pop() || '';
-  }
-
   async generateChunkPath(
     sourcePath: string,
     variant: Variant,
@@ -382,20 +366,7 @@ export class DefaultPipelineExecutor implements PipelineExecutor {
 
     // Default: Generate clean filename
     const fileName = this.getChunkFileName(chunk, manifest);
-
-    // 3. Determine parent folder based on variant
-    // If variant.uri is absolute, we used a subfolder for it, so chunks go there too
-    const isVariantAbsolute = variant.uri.match(/^https?:\/\//);
-    let subfolder = '';
-
-    if (isVariantAbsolute) {
-      subfolder = this.getVariantPath(variant);
-    } else {
-      // use the relative directory from the original variant URI
-      const pathParts = variant.uri.split('/');
-      pathParts.pop();
-      subfolder = pathParts.length > 0 ? `${pathParts.join('/')}/` : '';
-    }
+    const subfolder = this.getVariantPath(variant);
 
     const destConfig = context.config.destination.config;
     if ('path' in destConfig) {

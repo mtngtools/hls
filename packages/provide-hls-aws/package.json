@@ -1,6 +1,6 @@
 {
     "name": "@mtngtools/provide-hls-aws",
-    "version": "0.0.1-experimental.3",
+    "version": "0.0.1-experimental.4",
     "description": "AWS S3 implementation of HLS Storage",
     "type": "module",
     "main": "./dist/index.js",

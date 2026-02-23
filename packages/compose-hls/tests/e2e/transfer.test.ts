@@ -28,7 +28,7 @@ d('ComposeHlsClient E2E Transfer', () => {
 
         const client = new ComposeHlsClient();
 
-        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-') + '-transfer';
         const s3PrefixStr = S3_PREFIX ? S3_PREFIX : '';
 
         // Let's create an s3:// formatted path to trigger ComposeStorage dynamically mapping to AwsS3Storage

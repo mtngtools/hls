@@ -52,7 +52,7 @@ export function loadConfig(configPath: string): CliConfig {
  * Merge CLI args and config file into TransferConfig
  */
 export function createTransferConfig(
-  args: { source: string; destination: string; maxConcurrent?: number; maxRetries?: number; retryDelay?: number },
+  args: { source: string; destination: string; maxConcurrent?: number; maxRetries?: number; retryDelay?: number; m3u8Name?: string },
   config?: CliConfig,
 ): TransferConfig {
   // Determine source mode (always 'fetch' for now)
@@ -75,24 +75,31 @@ export function createTransferConfig(
   // Determine destination mode and URL/path
   const isUrl = args.destination.startsWith('http://') || args.destination.startsWith('https://');
   const destMode = config?.destination?.mode ?? (isUrl ? 'fetch' : 'file');
-  
+
   // Use config file URL if provided and mode is fetch, otherwise use args.destination
-  const destUrl = destMode === 'fetch' && config?.destination?.url 
-    ? config.destination.url 
+  let destUrl = destMode === 'fetch' && config?.destination?.url
+    ? config.destination.url
     : args.destination;
+
+  // When m3u8Name is passed, the CLI positional destination is treated as a directory.
+  // We enforce a trailing slash so that pipeline routing sees it correctly.
+  if (args.m3u8Name && destMode === 'file' && !destUrl.endsWith('/')) {
+    destUrl += '/';
+  }
 
   const destinationConfig = {
     mode: destMode,
+    m3u8Name: args.m3u8Name,
     config:
       destMode === 'file'
         ? {
-            path: destUrl,
-          }
+          path: destUrl,
+        }
         : {
-            url: destUrl,
-            headers: config?.destination?.headers ?? {},
-            timeout: config?.destination?.timeout ?? 30000,
-          },
+          url: destUrl,
+          headers: config?.destination?.headers ?? {},
+          timeout: config?.destination?.timeout ?? 30000,
+        },
     concurrency: {
       maxConcurrent: config?.destination?.concurrency?.maxConcurrent ?? 5,
     },
@@ -104,7 +111,7 @@ export function createTransferConfig(
 
   return {
     source: sourceConfig,
-    destination: destinationConfig,
+    destination: destinationConfig as TransferConfig['destination'],
   };
 }
 

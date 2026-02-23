@@ -5,6 +5,10 @@ export interface ComposeCliArgs {
     autoVerifyChunks?: boolean;
     /** Optional ACL string applied onto S3 targets (e.g., 'public-read') */
     acl?: string;
+    /** Optional bucket for tracking progress statuses via JsonProgressTracker */
+    statusBucket?: string;
+    /** Optional prefix for writing track statuses */
+    statusPrefix?: string;
 }
 
 export function parseComposeArgs(argv: string[]): ComposeCliArgs {
@@ -32,6 +36,20 @@ export function parseComposeArgs(argv: string[]): ComposeCliArgs {
                 process.exit(1);
             }
             args.acl = next;
+        } else if (arg === '--status-bucket') {
+            const next = argv[++i];
+            if (!next) {
+                console.error(`Error: ${arg} requires a value`);
+                process.exit(1);
+            }
+            args.statusBucket = next;
+        } else if (arg === '--status-prefix') {
+            const next = argv[++i];
+            if (!next) {
+                console.error(`Error: ${arg} requires a value`);
+                process.exit(1);
+            }
+            args.statusPrefix = next;
         }
         i++;
     }

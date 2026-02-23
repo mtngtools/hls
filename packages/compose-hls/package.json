@@ -1,6 +1,6 @@
 {
     "name": "@mtngtools/compose-hls",
-    "version": "0.0.1-experimental.3",
+    "version": "0.0.1-experimental.4",
     "description": "Composed HLS core orchestrator with AWS S3 support",
     "type": "module",
     "main": "./dist/index.js",
@@ -15,6 +15,7 @@
         "dist"
     ],
     "scripts": {
+        "example:advanced-s3": "tsx examples/advanced-s3.ts",
         "build": "vite build",
         "dev": "vite build --watch",
         "clean": "rimraf dist",
@@ -34,6 +35,7 @@
         "publish:experimental": "pnpm publish --tag experimental --access public"
     },
     "dependencies": {
+        "@aws-sdk/client-s3": "^3.600.0",
         "@mtngtools/frame-hls-base": "workspace:*",
         "@mtngtools/provide-hls-aws": "workspace:*",
         "@mtngtools/utils-hls-types": "workspace:*"

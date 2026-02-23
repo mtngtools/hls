@@ -24,6 +24,7 @@ export async function executeTransfer(args: CliArgs): Promise<void> {
         maxConcurrent: args.maxConcurrent,
         maxRetries: args.maxRetries,
         retryDelay: args.retryDelay,
+        m3u8Name: args.m3u8Name,
       },
       configFile,
     );
@@ -92,7 +93,7 @@ function reportOverallProgress(progress: OverallProgress, verbose: boolean): voi
   if (verbose) {
     console.log(
       `Progress: ${progress.completedVariants}/${progress.totalVariants} variants (${variantPercent}%), ` +
-        `${progress.completedChunks}/${progress.totalChunks} chunks (${chunkPercent}%)`,
+      `${progress.completedChunks}/${progress.totalChunks} chunks (${chunkPercent}%)`,
     );
   } else {
     // Simple progress indicator

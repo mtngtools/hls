@@ -18,3 +18,32 @@ It bridges core capabilities of base utilities and AWS-specific logic without in
 ## Usage
 
 Allows developers composing transfer pipelines to seamlessly pass their S3 configuration requirements and execute a transfer job identically to how they would utilizing pure file system execution.
+
+### `transferToS3` Helper API
+
+The `transferToS3` function provides a simplified way to execute a standard transfer to an S3 destination without needing to manually construct the `ComposeHlsClient` and `TransferJobExecutor` objects.
+
+```typescript
+import { transferToS3 } from '@mtngtools/compose-hls';
+
+await transferToS3({
+    sourceM3u8Path: 'https://example.com/master.m3u8',
+    mediaDestination: {
+        bucket: 'my-media-bucket',
+        storagePrefix: 'hls-output',
+        subPath: 'video123',
+        m3u8Name: 'index'
+    },
+    verificationDestination: {
+        bucket: 'my-status-bucket',
+        storagePrefix: 'status-logs',
+        subPath: 'video123-status'
+    }
+});
+```
+
+- **`sourceM3u8Path`**: The URL to the source M3U8 manifest.
+- **`mediaDestination`**: Configuration for where the HLS media files will be saved.
+  - Generates the path `s3://[bucket]/[storagePrefix]/[subPath]/[m3u8Name].m3u8`.
+  - `autoVerifyChunks` is enabled implicitly when using S3 verification.
+- **`verificationDestination`**: (Optional) Configuration for saving the JSON transfer status outputs via `JsonProgressTracker` and `AwsS3Storage`. If omitted, external chunk verification tracking is disabled. Accepts `storagePrefix` and `subPath` similarly to target destination.
