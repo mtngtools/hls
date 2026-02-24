@@ -53,7 +53,7 @@ describe('Pipeline Naming Logic', () => {
                 mockContext
             );
 
-            expect(path).toBe('/tmp/out/001.ts');
+            expect(path).toBe('/tmp/out/1000/001.ts');
         });
 
         it('should strip query parameters', async () => {
@@ -70,7 +70,7 @@ describe('Pipeline Naming Logic', () => {
                 mockContext
             );
 
-            expect(path).toBe('/tmp/out/123.ts');
+            expect(path).toBe('/tmp/out/1000/123.ts');
         });
 
         it('should fall back to index for non-numbered filenames', async () => {
@@ -89,7 +89,7 @@ describe('Pipeline Naming Logic', () => {
                 mockContext
             );
 
-            expect(path).toBe('/tmp/out/0.ts');
+            expect(path).toBe('/tmp/out/1000/0.ts');
         });
 
         it('should respect subfolders for absolute variant URIs', async () => {

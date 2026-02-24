@@ -53,7 +53,7 @@ describe('transferToS3 API', () => {
 
         const executorCallArgs = vi.mocked(TransferJobExecutor).mock.calls[0];
 
-        const jobConfig = executorCallArgs[0];
+        const jobConfig = executorCallArgs![0];
 
         // 3. Expected job config mapping 
         expect(jobConfig).toEqual({
@@ -91,7 +91,7 @@ describe('transferToS3 API', () => {
         });
 
         const executorCallArgs = vi.mocked(TransferJobExecutor).mock.calls[0];
-        const jobConfig = executorCallArgs[0];
+        const jobConfig = executorCallArgs![0];
 
         const configAny = jobConfig.transferConfig.destination.config as any;
         expect(configAny.path).toBe('s3://test-bucket');
@@ -112,7 +112,7 @@ describe('transferToS3 API', () => {
         });
 
         const executorCallArgs = vi.mocked(TransferJobExecutor).mock.calls[0];
-        const jobConfig = executorCallArgs[0];
+        const jobConfig = executorCallArgs![0];
 
         // verify AWS parameters included inside the destination object configuration
         const configAny = jobConfig.transferConfig.destination.config as any;
